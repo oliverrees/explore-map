@@ -2,70 +2,93 @@ import { Header } from "./components/Header";
 import { HomeHeader } from "./components/HomeHeader";
 import { ThreeCardPanel } from "./components/ThreeCardPanel";
 import Image from "next/image";
-import iso from "../app/assets/img/map.jpeg";
+import select from "./assets/img/select.png";
+import enhance from "./assets/img/enhance.png";
+import share from "./assets/img/share.png";
+import grid from "./assets/img/grid.png";
+import isoBig from "./assets/img/isoBig.png";
 
 export default function Home() {
   return (
     <>
       <HomeHeader />
-      <div id="how"></div>
+      <div id="how" />
       <ThreeCardPanel
         noMargin
         title="How does it work?"
         description={[
-          "We use the latest psychology, technology and neuroscience to measure your current state, help you discover insights about yourself and empower you to change and adapt.",
+          "Choose which activities you want to share, enhance and customise your map and then share it with the world",
         ]}
         cards={[
           {
             id: 1,
             name: "Select",
-            href: "/measure",
             description: [
-              "We'll measure your brainwaves, sense of self and wellbeing levels during an immersive experience.",
+              "Connect to your Strava account and select the activities you want to add to your map.",
             ],
-            ctaText: "More about measurement",
             content: (
-              <Image
-                src={iso}
-                alt="Discover"
-                className="h-full w-full object-contain object-center bg-obsidian"
-              />
+              <div className="relative w-full h-full">
+                <div
+                  style={{
+                    backgroundImage: `url(${grid.src})`,
+                  }}
+                  className="absolute top-0 lg:right-0 lg:w-full w-full lg:h-full h-full z-0 bg-repeat"
+                />
+                <Image
+                  src={select}
+                  alt="Select"
+                  className="h-full w-full object-contain object-center z-10 p-2 relative"
+                />
+              </div>
             ),
           },
           {
             id: 2,
             name: "Enhance",
-            href: "/discover",
             description: [
-              "You'll then receive a discovery report containing a breakdown of your self, life and mind.",
+              "Customise and enhance your map with a range of filters and overlays to make it truly unique.",
             ],
-            ctaText: "More about discovery",
             content: (
-              <Image
-                src={iso}
-                alt="Discover"
-                className="h-full w-full object-contain object-center bg-obsidian"
-              />
+              <div className="relative w-full h-full">
+                <div
+                  style={{
+                    backgroundImage: `url(${grid.src})`,
+                  }}
+                  className="absolute top-0 lg:right-0 lg:w-full w-full lg:h-full h-full z-0 bg-repeat"
+                />
+                <Image
+                  src={enhance}
+                  alt="Enhance"
+                  className="h-full w-full object-contain object-center z-10 p-2 relative"
+                />
+              </div>
             ),
           },
           {
             id: 3,
             name: "Share",
-            href: "/change",
             description: [
-              "How, or if, you want to change is up to you. We offer 180+ interventions that you can experiment with.",
+              "Share your map with friends, family and supporters to show off your achievements.",
             ],
-            ctaText: "More about change",
             content: (
-              <Image
-                src={iso}
-                alt="Measure Waves"
-                className="h-full w-full object-contain p-6 object-center bg-obsidian"
-              />
+              <div className="relative w-full h-full">
+                <div
+                  style={{
+                    backgroundImage: `url(${grid.src})`,
+                  }}
+                  className="absolute top-0 lg:right-0 lg:w-full w-full lg:h-full h-full z-0 bg-repeat"
+                />
+                <Image
+                  src={share}
+                  alt="Share"
+                  className="h-full w-full object-contain object-center z-10 p-2 relative"
+                />
+              </div>
             ),
           },
         ]}
       />
+      {/* <Image src={isoBig} alt={""} className="transform scale-150" /> */}
     </>
   );
 }

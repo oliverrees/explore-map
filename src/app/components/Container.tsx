@@ -20,8 +20,8 @@ export const Container = ({
     : "bg-white text-black";
   const padding = !customPadding
     ? topPadding
-      ? "pt-12 pb-12 lg:py-32 2xl:py-32"
-      : "pb-12 lg:py-32 2xl:py-32"
+      ? "pt-24 pb-24 lg:py-32 2xl:py-32"
+      : "pb-24 lg:py-32 2xl:py-32"
     : customPadding;
   return (
     <div className={`${darkMode}`}>

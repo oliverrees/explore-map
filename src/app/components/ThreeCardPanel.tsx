@@ -50,7 +50,7 @@ export const ThreeCardPanel = ({
         </div>
 
         <div className="relative mt-8 lg:mt-12">
-          <div className="relative -mb-6 w-full overflow-x-auto pb-6 no-scrollbar">
+          <div className="relative -mb-6 w-full overflow-x-auto pb-2 no-scrollbar">
             <ul
               role="list"
               className={`${gridColsClass} mx-4 inline-flex space-x-8 sm:mx-6 lg:mx-0 lg:grid lg:gap-x-12 lg:space-x-0 pr-4 items-start flex-grow mb-4`}
@@ -58,17 +58,17 @@ export const ThreeCardPanel = ({
               {cards.map((card: any) => (
                 <ShadowCard key={card.id} darkMode={dark}>
                   <li
-                    className={`inline-flex w-72 flex-col overflow-hidden lg:w-full ${darkModeText}`}
+                    className={`inline-flex w-72 flex-col lg:w-full ${darkModeText}`}
                   >
                     <div className="group relative">
-                      <div className="w-full h-64 relative overflow-hidden">
+                      <div className="w-full h-64 relative overflow-hidden rounded-xl shadow-lg border">
                         {card.content}
                       </div>
-                      <div className="p-6 pt-4 lg:pt-6">
+                      <div className="p-2 pt-4 lg:pt-6">
                         <h3 className="mt-1 text-2xl font-display leading-normal">
                           {card.name}
                         </h3>
-                        <div className="mt-2 mb-6 font-light text-md opacity-80 flex flex-col gap-4">
+                        <div className="mt-2 mb-2 font-light text-md opacity-80 flex flex-col gap-4">
                           {card.description.map(
                             (desc: string, index: number) => (
                               <div key={index}>{desc}</div>

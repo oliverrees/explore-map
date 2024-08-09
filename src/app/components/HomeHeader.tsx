@@ -17,7 +17,7 @@ export const HomeHeader = ({}: HomeHeaderProps) => {
     <>
       {height === 0 && <LoadingScreen />}
       <div
-        className="flex flex-col w-full overflow-hidden"
+        className="flex flex-col w-full relative overflow-hidden"
         style={{
           height: `${height}px`,
         }}

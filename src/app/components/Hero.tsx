@@ -29,7 +29,7 @@ export const Hero = ({}: HeroProps) => {
       <div className="max-w-7xl mx-auto h-full relative w-full lg:px-8 lg:py-36 4xl:py-48">
         <div className="flex flex-col lg:flex-row h-full justify-center items-center gap-5 lg:gap-16">
           <div className="h-full lg:max-h-96 w-full lg:w-11/12 lg:order-2 z-10">
-            <div className="w-full h-full relative overflow-x-clip lg:top-0 lg:h-96 transform scale-[2.1] lg:scale-[2.5] lg:translate-x-[30rem] translate-x-64 translate-y-8">
+            <div className="w-full h-full relative overflow-x-clip lg:top-0 lg:h-96 transform scale-[2.1] lg:scale-[2.5] lg:translate-x-[30rem] translate-x-72 translate-y-8">
               <Image
                 src={backgroundImageLarge}
                 alt="Map"
