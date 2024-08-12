@@ -2,7 +2,7 @@ import { Header } from "../Header";
 import { HomeHeader } from "../HomeHeader";
 import { ThreeCardPanel } from "../ThreeCardPanel";
 import Image from "next/image";
-import select from "../../assets/img/select.png";
+import select from "../../assets/img/past.png";
 import enhance from "../../assets/img/enhance.png";
 import share from "../../assets/img/share.png";
 import grid from "../../assets/img/grid.png";

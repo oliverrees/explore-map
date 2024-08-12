@@ -9,7 +9,7 @@ export const TitleBlock = ({ title, description, dark }: TitleBlockProps) => {
   return (
     <div>
       <h2
-        className={`text-2xl lg:text-2xl font-display mb-3 lg:mb-4 leading-13 md:leading-13 ${darkModeText}`}
+        className={`text-2xl lg:text-2xl font-display font-semibold mb-3 lg:mb-4 leading-13 md:leading-13 ${darkModeText}`}
       >
         {title}
       </h2>

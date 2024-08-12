@@ -11,6 +11,6 @@ const config: Config = {
       display: ["IBM Plex Mono", "monospace"],
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };
 export default config;

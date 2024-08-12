@@ -43,7 +43,7 @@ export const Hero = ({}: HeroProps) => {
           </div>
           <div className="lg:order-1 flex items-center flex-col px-4 lg:px-0 md:pb-6 md:pt-6 lg:py-0 lg:mt-5 w-full">
             <div className="h-auto relative z-10">
-              <h1 className="text-[2rem] leading-10 md:text-5xl md:leading-13 xl:leading-13 xl:text-[3.5rem] lg:leading-tight font-display text-black">
+              <h1 className="text-[2rem] leading-10 md:text-5xl md:leading-13 xl:leading-13 xl:text-[3.5rem] lg:leading-tight font-display font-semibold text-black">
                 Share your adventures with the world
               </h1>
               <div className="text-md md:text-lg xl:text-xl mt-3 md:mt-4 leading-6 font-light xl:leading-8 xl:w-10/12">
