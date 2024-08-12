@@ -5,6 +5,7 @@ import backgroundImageLarge from "../assets/img/largeIso.png";
 import grid from "../assets/img/grid.png";
 import Image from "next/image";
 import stravaConnect from "../assets/img/connect.svg";
+import { getStravaAuthUrl } from "../../../lib/auth/functions/getStravaAuthUrl";
 
 interface HeroProps {}
 
@@ -51,7 +52,7 @@ export const Hero = ({}: HeroProps) => {
               </div>
               <div className="flex gap-20 items-center flex-col lg:flex-row gap-x-12 gap-y-3 w-full mt-6 md:mt-8 lg:mt-10 h-auto">
                 <Link
-                  href="/book"
+                  href={getStravaAuthUrl()}
                   className="w-full bg-[#FC4C02] lg:w-auto flex justify-center"
                 >
                   <Image src={stravaConnect} alt="Strava Connect" />
