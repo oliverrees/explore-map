@@ -1,5 +1,5 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
-import map from "@/app/assets/img/map.jpeg";
+import map from "@/app/assets/img/map.png";
 import Image from "next/image";
 import Link from "next/link";
 

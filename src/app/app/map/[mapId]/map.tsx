@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { getSupabaseClient } from "../../../../lib/supabase/client";
 import { NoMap } from "@/app/components/authed/components/home/NoMap";
-import { classNames } from "../../../../lib/functions/classNames";
+import { classNames } from "../../../../../lib/functions/classNames";
 
 const secondaryNavigation = [
   { name: "Overview", href: "#", current: true },
@@ -41,6 +41,7 @@ const activityItems = [
 ];
 
 export default function AuthedHome() {
+  const mapId = 
   return (
     <main>
       <header>

@@ -27,7 +27,7 @@ export const UserContainer = () => {
 
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
-      <div className="flex h-32 shrink-0 items-center">
+      <div className="flex pt-4 shrink-0 items-center">
         <Image alt="Explore Map Logo" src={logo} className="h-28 w-auto" />
       </div>
       <nav className="flex flex-1 flex-col">

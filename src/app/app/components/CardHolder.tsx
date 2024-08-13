@@ -1,11 +1,12 @@
 interface CardHolderProps {
   children?: React.ReactNode;
+  classNames?: string;
 }
 
-export const CardHolder = ({ children }: CardHolderProps) => {
+export const CardHolder = ({ children, classNames }: CardHolderProps) => {
   return (
-    <div className="bg-white shadow sm:rounded-lg w-full">
-      <div className="px-4 py-5 sm:p-6 flex justify-between">{children}</div>
+    <div className={`bg-white shadow sm:rounded-lg w-full ${classNames}`}>
+      <div className="">{children}</div>
     </div>
   );
 };
