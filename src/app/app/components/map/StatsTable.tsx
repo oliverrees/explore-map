@@ -1,0 +1,159 @@
+"use client";
+import { Switch } from "@headlessui/react";
+import { useEffect, useState } from "react";
+import { format, addDays } from "date-fns";
+import { secondsToHMS } from "../../../../../lib/functions/secondsToHMS";
+interface Props {
+  data: any;
+  onChangeShowPins: (pinStatus: boolean) => void;
+  showPins: boolean;
+  showSatellite: boolean;
+  onChangeShowSatellite: (satelliteStatus: boolean) => void;
+}
+
+function classNames(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+export const revalidate = 600;
+
+const StatsTable = ({
+  data,
+  onChangeShowPins,
+  showPins,
+  onChangeShowSatellite,
+  showSatellite,
+}: Props) => {
+  const [miles, setMiles] = useState(false);
+  const [expandStats, setExpandStats] = useState(false);
+
+  const stats = [
+    {
+      label: "Total distance",
+      value: {
+        km: (data.totalDistance / 1000).toFixed(1),
+        miles: ((data.totalDistance / 1000) * 0.621371).toFixed(1),
+      },
+      alwaysShow: false,
+    },
+    {
+      label: "Total elevation",
+      value: {
+        km: data.totalElevationGain.toFixed(1),
+        miles: (data.totalElevationGain * 3.28084).toFixed(1),
+      },
+      alwaysShow: false,
+    },
+  ];
+
+  return (
+    <div className="bg-white py-0.5 md:py-0">
+      <table className="w-full divide-y divide-gray-300 lg:flex ">
+        <tbody className="divide-y divide-gray-200 w-full">
+          {stats.map((stat) => (
+            <tr
+              key={stat.label}
+              className={classNames(
+                !expandStats && !stat.alwaysShow && "hidden",
+                "flex justify-between "
+              )}
+            >
+              <td className="px-4 py-3 text-xs md:text-sm font-medium text-gray-900 capitalize">
+                {stat.label}
+              </td>
+              <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
+                {miles ? stat.value.miles : stat.value.km}
+                &nbsp;
+                {miles
+                  ? stat.label == "Total elevation"
+                    ? "ft"
+                    : "miles"
+                  : stat.label == "Total elevation"
+                  ? "m"
+                  : "km"}
+              </td>
+            </tr>
+          ))}
+          {expandStats && (
+            <>
+              <tr className="flex justify-between">
+                <td className="px-4 py-3 text-xs md:text-sm font-medium text-gray-900">
+                  Total Time (hrs)
+                </td>
+                <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
+                  {secondsToHMS(data.totalTime)}
+                </td>
+              </tr>
+              <tr className="flex justify-between">
+                <td className="px-4 py-3 text-xs md:text-sm font-medium text-gray-900">
+                  Total Activities
+                </td>
+                <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
+                  {data.activityIds.length}
+                </td>
+              </tr>
+            </>
+          )}
+        </tbody>
+      </table>
+      <div
+        style={{ pointerEvents: "all" }}
+        className="py-2 pt-3 md:py-4 items-center bg-gray-50 justify-center gap-y-2 text-center text-xs md:text-sm font-semibold grid grid-cols-4 px-4"
+      >
+        <div>
+          <UnitSwitch
+            checkedStatus={expandStats}
+            setCheckedStatus={setExpandStats}
+          />
+        </div>
+        <div>
+          <UnitSwitch
+            checkedStatus={showSatellite}
+            setCheckedStatus={onChangeShowSatellite}
+          />
+        </div>
+        <div>
+          <UnitSwitch
+            checkedStatus={showPins}
+            setCheckedStatus={onChangeShowPins}
+          />
+        </div>
+        <div>
+          <UnitSwitch checkedStatus={miles} setCheckedStatus={setMiles} />
+        </div>
+        <div>Stats</div>
+        <div>Satellite</div>
+        <div>Pins</div>
+        <div>KM/Miles</div>
+      </div>
+    </div>
+  );
+};
+
+interface UnitSwitchProps {
+  checkedStatus: boolean;
+  setCheckedStatus: any;
+}
+
+const UnitSwitch = ({ checkedStatus, setCheckedStatus }: UnitSwitchProps) => {
+  return (
+    <Switch
+      checked={checkedStatus}
+      onChange={setCheckedStatus}
+      className={classNames(
+        "bg-gray-200 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+      )}
+    >
+      <span className="sr-only">Use setting</span>
+      <span
+        aria-hidden="true"
+        className={classNames(
+          checkedStatus ? "translate-x-5" : "translate-x-0",
+          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+        )}
+      />
+    </Switch>
+  );
+};
+
+export default StatsTable;

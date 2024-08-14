@@ -73,7 +73,7 @@ export default function ActivitiesTable() {
     }
   };
 
-  const syncActivitiesWithStrava = async () => {
+  const syncActivitiesWithStrava = async (forceReload?: boolean) => {
     try {
       setLoading(true);
       const response = await fetch("/auth/get-activities", {
@@ -83,6 +83,7 @@ export default function ActivitiesTable() {
         },
         body: JSON.stringify({
           unique_id: userData.unique_id,
+          forceReload,
         }),
       });
 
@@ -173,7 +174,7 @@ export default function ActivitiesTable() {
   };
 
   const handleSyncButtonClick = async () => {
-    await syncActivitiesWithStrava();
+    await syncActivitiesWithStrava(true);
   };
 
   const createMap = async () => {

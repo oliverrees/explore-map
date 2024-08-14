@@ -33,7 +33,7 @@ async function refreshStravaToken(refreshToken: string) {
 async function getStravaActivities(accessToken: string, fetchAll: boolean) {
   let allActivities: any = [];
   let page = 1;
-  const perPage = 30;
+  const perPage = 200;
   let fetchMore = true;
 
   while (fetchMore) {
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
         message: "No ID provided",
       });
     }
-
+    const forceReload = data.forceReload === true;
     const { data: userRecord, error: userError } = await supabase
       .from("exploremap_users")
       .select("*")
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       .select("activity_id")
       .eq("strava_id", userRecord.strava_id);
 
-    const fetchAll = existingActivities?.length === 0;
+    const fetchAll = forceReload || existingActivities?.length === 0;
     const activities = await getStravaActivities(
       stravaTokenData.access_token,
       fetchAll
