@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { classNames } from "../../../../../../lib/functions/classNames";
 import { secondsToHMS } from "../../../../../../lib/functions/secondsToHMS";
+import { format } from "date-fns";
+import { useUserContext } from "@/app/app/components/UserContext";
+import { useRouter } from "next/navigation";
 
 const secondaryNavigation = [
   { name: "Overview", href: "#", current: true },
@@ -16,7 +19,8 @@ interface MapSettingsProps {
 }
 
 export const MapSettings = ({ data }: MapSettingsProps) => {
-  console.log(data.totalTime);
+  const { supabase, fetchMapData } = useUserContext();
+  const router = useRouter();
   const stats = [
     { name: "Total Activities", value: data.activityIds.length },
     {
@@ -34,6 +38,26 @@ export const MapSettings = ({ data }: MapSettingsProps) => {
       unit: "m",
     },
   ];
+
+  const deleteMap = async () => {
+    // confirm box
+    if (!confirm("Are you sure you want to delete this map?")) {
+      return;
+    }
+    const { data: mapData, error: mapError } = await supabase
+      .from("exploremap_maps")
+      .delete()
+      .eq("map_id", data.id);
+
+    if (mapError) {
+      console.error(mapError);
+    } else {
+      router.push("/app/home");
+      fetchMapData();
+      console.log(mapData);
+    }
+  };
+
   return (
     <main>
       <header>
@@ -64,22 +88,30 @@ export const MapSettings = ({ data }: MapSettingsProps) => {
                 <div className="h-2 w-2 rounded-full bg-current" />
               </div>
               <h1 className="flex gap-x-3 text-base leading-7">
-                <span className="font-semibold ">Planetaria</span>
+                <span className="font-semibold ">Your Maps</span>
                 <span className="text-gray-600">/</span>
-                <span className="font-semibold ">mobile-api</span>
+                <span className="font-semibold ">{data.id}</span>
               </h1>
             </div>
             <p className="mt-2 text-xs leading-6 text-gray-400">
-              Deploys from GitHub via main branch
+              Created on {format(data.created, "MMMM dd, yyyy")}
             </p>
           </div>
-          <div className="order-first flex-none rounded-full bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-400/30 sm:order-none">
-            Production
+          <div className="flex gap-2">
+            <div
+              className="order-first cursor-pointer flex-none rounded-full bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/30 sm:order-none"
+              onClick={deleteMap}
+            >
+              Delete Map
+            </div>
+            <div className="order-first flex-none rounded-full bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-400/30 sm:order-none">
+              Share Map
+            </div>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 bg-white shadow-xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 bg-white">
           {stats.map((stat, statIdx) => (
             <div
               key={stat.name}

@@ -1,29 +1,22 @@
+"use client";
 import logo from "@/app/assets/img/logo.png";
 import Image from "next/image";
-import {
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  MapIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
+import { usePathname } from "next/navigation";
+
+import { HomeIcon } from "@heroicons/react/24/outline";
 import { classNames } from "../../../../../lib/functions/classNames";
 import { useUserContext } from "@/app/app/components/UserContext";
 import Link from "next/link";
 
 const navigation = [
-  { name: "Home", href: "/app/home", icon: HomeIcon, count: 0, current: true },
-];
-const teams = [
-  { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
-  { id: 2, name: "Tailwind Labs", href: "#", initial: "T", current: false },
-  { id: 3, name: "Workcation", href: "#", initial: "W", current: false },
+  { name: "Home", href: "/app/home", icon: HomeIcon, count: 0 },
 ];
 
 export const UserContainer = () => {
-  const { userData } = useUserContext();
+  const { userData, mapData } = useUserContext();
+  // get current url
+  const pathname = usePathname();
+  const currentPage = pathname.split("/").pop();
 
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
@@ -39,7 +32,7 @@ export const UserContainer = () => {
                   <Link
                     href={item.href}
                     className={classNames(
-                      item.current
+                      currentPage === item.href.split("/").pop()
                         ? "bg-gray-50 text-blue-600"
                         : "text-gray-700 hover:bg-gray-50 hover:text-blue-600",
                       "group cursor-pointer flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -48,7 +41,7 @@ export const UserContainer = () => {
                     <item.icon
                       aria-hidden="true"
                       className={classNames(
-                        item.current
+                        currentPage === item.href.split("/").pop()
                           ? "text-blue-600"
                           : "text-gray-400 group-hover:text-blue-600",
                         "h-6 w-6 shrink-0"
@@ -69,16 +62,19 @@ export const UserContainer = () => {
             </ul>
           </li>
           <li>
-            <div className="text-xs font-semibold leading-6 text-gray-400">
-              Your maps
-            </div>
-            <ul role="list" className="-mx-2 mt-2 space-y-1">
-              {teams.map((team) => (
-                <li key={team.name}>
+            {mapData.length > 0 && (
+              <div className="text-xs font-semibold leading-6 text-gray-400">
+                Your maps
+              </div>
+            )}
+
+            <ul role="list" className="-mx-2 mt-2 space-y-1 pb-6">
+              {mapData.map((map: any) => (
+                <li key={map.map_id}>
                   <Link
-                    href={team.href}
+                    href={`/app/map/${map.map_id}`}
                     className={classNames(
-                      team.current
+                      currentPage === map.map_id
                         ? "bg-gray-50 text-blue-600"
                         : "text-gray-700 hover:bg-gray-50 hover:text-blue-600",
                       "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -86,21 +82,21 @@ export const UserContainer = () => {
                   >
                     <span
                       className={classNames(
-                        team.current
+                        currentPage === map.map_id
                           ? "border-blue-600 text-blue-600"
                           : "border-gray-200 text-gray-400 group-hover:border-blue-600 group-hover:text-blue-600",
                         "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
                       )}
                     >
-                      {team.initial}
+                      {map.map_id.charAt(0)}
                     </span>
-                    <span className="truncate">{team.name}</span>
+                    <span className="truncate">{map.map_id}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </li>
-          <li className="-mx-6 mt-auto">
+          <li className="-mx-6 mt-auto absolute bottom-0 bg-gray-50 w-full border-r">
             <a
               href="#"
               className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50"

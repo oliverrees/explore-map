@@ -28,7 +28,7 @@ interface Activity {
 
 export default function ActivitiesTable() {
   const router = useRouter();
-  const { userData, supabase } = useUserContext();
+  const { userData, supabase, fetchMapData } = useUserContext();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMessage, setLoadingMessage] = useState<string>(
@@ -82,7 +82,6 @@ export default function ActivitiesTable() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          unique_id: userData.unique_id,
           forceReload,
         }),
       });
@@ -191,6 +190,7 @@ export default function ActivitiesTable() {
       setError(error.message);
       setLoading(false);
     } else {
+      fetchMapData();
       router.push(`/app/map/${mapId}`);
     }
   };

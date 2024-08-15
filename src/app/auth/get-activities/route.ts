@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../../../lib/supabase/supabaseService";
+import { cookies } from "next/headers";
+import { getSupabaseClient } from "../../../../lib/supabase/client";
 
 interface StravaTokenData {
   access_token: string;
@@ -100,11 +102,18 @@ export async function POST(request: Request) {
         message: "No ID provided",
       });
     }
+    const token = cookies().get("token")?.value || null;
+    if (!token) {
+      return NextResponse.json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+    const supabase = getSupabaseClient(token);
     const forceReload = data.forceReload === true;
     const { data: userRecord, error: userError } = await supabase
       .from("exploremap_users")
       .select("*")
-      .eq("unique_id", data.unique_id)
       .single();
 
     if (userError || !userRecord) {

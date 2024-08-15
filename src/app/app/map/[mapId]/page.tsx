@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import polyline from "@mapbox/polyline";
-import { LoadingScreen } from "@/app/components/LoadingScreen";
 import { MapSettings } from "./components/MapSettings";
 import { useUserContext } from "../../components/UserContext";
+import { LoadingSpinner } from "@/app/components/LoadingSpinner";
 
 const Map = dynamic(() => import("../../components/map/Map"), {
   ssr: false,
-  loading: () => <LoadingScreen />,
+  loading: () => (
+    <div className="flex items-center justify-center h-full">
+      <LoadingSpinner />
+    </div>
+  ),
 });
 
 interface Activity {
@@ -26,6 +29,9 @@ export default function MapPage() {
   const { supabase } = useUserContext();
 
   const [data, setData] = useState({
+    isShared: false,
+    created: "",
+    id: "",
     allCoords: [],
     activityIds: [],
     totalDistance: 0,
@@ -96,6 +102,9 @@ export default function MapPage() {
         );
 
         setData({
+          isShared: mapData.is_shared,
+          created: mapData.created_at,
+          id: mapData.map_id,
           allCoords,
           activityIds,
           totalDistance,
@@ -114,14 +123,26 @@ export default function MapPage() {
     fetchMapData();
   }, [mapId]);
 
-  if (loading) {
-    return <LoadingScreen />;
+  if (!data.id && !loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        Map not found
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col h-screen">
-      <MapSettings data={data} />
-      <Map data={data} />
+      {loading ? (
+        <div className="flex items-center justify-center h-full">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <>
+          <MapSettings data={data} />
+          <Map data={data} />
+        </>
+      )}
     </div>
   );
 }

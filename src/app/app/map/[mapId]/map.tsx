@@ -72,7 +72,7 @@ export default function AuthedHome() {
                 <div className="h-2 w-2 rounded-full bg-current" />
               </div>
               <h1 className="flex gap-x-3 text-base leading-7">
-                <span className="font-semibold text-white">Planetaria</span>
+                <span className="font-semibold text-white">Your Maps</span>
                 <span className="text-gray-600">/</span>
                 <span className="font-semibold text-white">mobile-api</span>
               </h1>

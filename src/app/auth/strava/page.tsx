@@ -40,17 +40,11 @@ export default function Track() {
     const getInfo = async () => {
       const data = await getUserInfo(code);
       if (data.success) {
-        router.push(`/`);
+        router.push(`/app/home`);
       } else {
         alert(data.message);
         router.push(`/`);
       }
-
-      // if (data.success) {
-      //   router.push(`/`);
-      // } else {
-
-      // }
     };
     isRequesting.current = true;
     getInfo();

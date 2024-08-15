@@ -31,8 +31,6 @@ export default function Sidebar({
     }, 500);
   };
 
-  console.log(activityData);
-
   if (!activityData.start_date) {
     return null;
   }

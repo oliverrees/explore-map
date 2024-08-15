@@ -4,15 +4,6 @@ import { supabase } from "../../../../lib/supabase/supabaseService";
 import { generateJWT } from "./lib/generateJWT";
 import { cookies } from "next/headers";
 
-function makeid() {
-  var text = "";
-  var possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i = 0; i < 30; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  return text.toUpperCase();
-}
-
 export async function POST(request: Request) {
   const userData = await request.json();
 
@@ -56,7 +47,6 @@ export async function POST(request: Request) {
         access_token: stravaTokenData.access_token,
         refresh_token: stravaTokenData.refresh_token,
         expires_at: stravaTokenData.expires_at,
-        unique_id: makeid(),
       },
       {
         onConflict: "strava_id",
@@ -64,11 +54,9 @@ export async function POST(request: Request) {
     )
     .select();
 
-  const unique_id = data ? data[0].unique_id : null;
-
-  const signedJWT = generateJWT(stravaTokenData.athlete.id, unique_id);
-  const oneDay = 24 * 60 * 60 * 1000;
-  cookies().set("token", signedJWT, { expires: Date.now() + oneDay });
+  const signedJWT = generateJWT(stravaTokenData.athlete.id);
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  cookies().set("token", signedJWT, { expires: Date.now() + sevenDays });
 
   if (error) {
     return NextResponse.json({

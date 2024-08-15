@@ -51,7 +51,6 @@ export type Database = {
           id: number;
           refresh_token: string | null;
           strava_id: string | null;
-          unique_id: string | null;
         };
         Insert: {
           access_token?: string | null;
@@ -61,7 +60,6 @@ export type Database = {
           id?: number;
           refresh_token?: string | null;
           strava_id?: string | null;
-          unique_id?: string | null;
         };
         Update: {
           access_token?: string | null;
@@ -71,7 +69,6 @@ export type Database = {
           id?: number;
           refresh_token?: string | null;
           strava_id?: string | null;
-          unique_id?: string | null;
         };
         Relationships: [];
       };

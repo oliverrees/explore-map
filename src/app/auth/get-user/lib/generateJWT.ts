@@ -1,10 +1,8 @@
 import jwt from "jsonwebtoken";
 
-export function generateJWT(strava_id: string, unique_id: string): string {
-  // Payload: This should include essential user information, such as user ID or email.
+export function generateJWT(strava_id: string): string {
   const payload = {
     strava_id: strava_id,
-    unique_id: unique_id,
   };
 
   // Secret key: This should be kept secret (store it in an environment variable).

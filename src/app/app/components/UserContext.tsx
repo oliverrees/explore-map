@@ -9,7 +9,9 @@ import grid from "../../assets/img/grid.png";
 interface UserContextProps {
   loading: boolean;
   userData: any;
+  mapData: any;
   supabase: any;
+  fetchMapData: () => void;
 }
 
 interface UserProviderProps {
@@ -33,26 +35,42 @@ export const UserProvider: React.FC<UserProviderProps> = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<any>(null);
+  const [mapData, setMapData] = useState<any[]>([]);
   const supabase = getSupabaseClient(token);
+  const fetchMapData = async () => {
+    const { data: mapData, error: mapError } = await supabase
+      .from("exploremap_maps")
+      .select("map_id, map_name");
 
+    if (mapData) {
+      setMapData(mapData);
+    }
+  };
   useEffect(() => {
-    const getUserData = async () => {
-      const { data } = await supabase.from("exploremap_users").select("*");
-      if (data) {
-        setUserData(data[0]);
+    const getData = async () => {
+      const { data: userData, error: userError } = await supabase
+        .from("exploremap_users")
+        .select("*");
+
+      await fetchMapData(); // Fetch map data
+
+      if (userData) {
+        setUserData(userData[0]);
         setLoading(false);
       }
     };
 
-    getUserData();
-  }, []);
+    getData();
+  }, [supabase]);
 
   if (loading) {
     return <LoadingScreen />;
   }
 
   return (
-    <UserContext.Provider value={{ loading, userData, supabase }}>
+    <UserContext.Provider
+      value={{ loading, userData, mapData, fetchMapData, supabase }}
+    >
       <div className="w-full flex">
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           <UserContainer />

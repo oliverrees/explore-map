@@ -8,10 +8,10 @@ export const NoMap = () => {
     <div className="text-center h-screen flex flex-col items-center justify-center">
       <Image src={map} alt="Terrain" className="h-96 w-auto" />
       <h3 className="mt-2 text-2xl font-display font-semibold text-gray-900">
-        Get Started
+        Create an ExploreMap
       </h3>
       <p className="mt-3 text-sm font-medium text-gray-500">
-        Create your first ExploreMap in minutes
+        Build a new map in minutes
       </p>
       <div className="mt-6">
         <Link
