@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { LoadingScreen } from "../../components/LoadingScreen";
 export default function Track() {
@@ -50,5 +50,9 @@ export default function Track() {
     getInfo();
   }, []);
 
-  return <LoadingScreen />;
+  return (
+    <Suspense>
+      <LoadingScreen />
+    </Suspense>
+  );
 }
