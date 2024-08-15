@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { supabase } from "../../../../lib/supabase/supabaseService";
 import { generateJWT } from "./lib/generateJWT";
