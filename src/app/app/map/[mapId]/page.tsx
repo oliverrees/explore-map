@@ -64,7 +64,7 @@ export default function MapPage() {
         const { data: activitiesData, error: activitiesError } = await supabase
           .from("exploremap_activities")
           .select("activity_data, activity_id")
-          .in("id", mapActivities);
+          .in("activity_id", mapActivities);
 
         if (activitiesError) throw new Error(activitiesError.message);
 

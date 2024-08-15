@@ -47,7 +47,7 @@ export default function MapType() {
               <h3 className="mt-2 text-xl font-display font-semibold text-gray-900">
                 {name}
               </h3>
-              <p className="mt-3 text-sm font-medium text-gray-500 text-center">
+              <p className="mt-3 text-sm font-medium text-gray-500 text-center px-4">
                 {description}
               </p>
               <Link

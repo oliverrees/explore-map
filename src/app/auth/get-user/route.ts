@@ -53,10 +53,6 @@ export async function POST(request: Request) {
     )
     .select();
 
-  const signedJWT = generateJWT(stravaTokenData.athlete.id);
-  const sevenDays = 7 * 24 * 60 * 60 * 1000;
-  cookies().set("token", signedJWT, { expires: Date.now() + sevenDays });
-
   if (error) {
     return NextResponse.json({
       success: false,
@@ -64,6 +60,10 @@ export async function POST(request: Request) {
       data: error,
     });
   }
+
+  const signedJWT = generateJWT(stravaTokenData.athlete.id);
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  cookies().set("token", signedJWT, { expires: Date.now() + sevenDays });
 
   return NextResponse.json({
     success: true,

@@ -52,12 +52,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({
         .from("exploremap_users")
         .select("*");
 
-      await fetchMapData(); // Fetch map data
-
       if (userData) {
+        if (userData.length === 0) {
+          // redirect to /auth/logout
+          window.location.href = "/auth/logout";
+        }
         setUserData(userData[0]);
         setLoading(false);
       }
+
+      await fetchMapData(); // Fetch map data
     };
 
     getData();

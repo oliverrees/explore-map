@@ -154,13 +154,13 @@ export default function ActivitiesTable() {
   };
 
   const handleSelectActivity = (activity: Activity) => {
-    const isSelected = selectedActivities.includes(activity.id);
+    const isSelected = selectedActivities.includes(activity.activity_id);
     if (isSelected) {
       setSelectedActivities(
-        selectedActivities.filter((id) => id !== activity.id)
+        selectedActivities.filter((id) => id !== activity.activity_id)
       );
     } else {
-      setSelectedActivities([...selectedActivities, activity.id]);
+      setSelectedActivities([...selectedActivities, activity.activity_id]);
     }
   };
 
@@ -168,7 +168,7 @@ export default function ActivitiesTable() {
     if (selectedActivities.length === activities.length) {
       setSelectedActivities([]); // Deselect all if all are selected
     } else {
-      setSelectedActivities(activities.map((activity) => activity.id)); // Select all
+      setSelectedActivities(activities.map((activity) => activity.activity_id)); // Select all
     }
   };
 
@@ -259,9 +259,9 @@ export default function ActivitiesTable() {
               <tbody className="divide-y divide-gray-200 bg-white ">
                 {paginatedActivities.map((activity) => (
                   <TableRow
-                    key={activity.id}
+                    key={activity.activity_id}
                     activity={activity}
-                    selected={selectedActivities.includes(activity.id)}
+                    selected={selectedActivities.includes(activity.activity_id)}
                     onSelect={handleSelectActivity}
                   />
                 ))}

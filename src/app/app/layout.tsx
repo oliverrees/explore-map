@@ -9,12 +9,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     return redirect("/");
   }
 
-  return (
-    <html lang="en">
-      <body>
-        {/* Pass the token to the client-side provider */}
-        <UserProvider token={token}>{children}</UserProvider>
-      </body>
-    </html>
-  );
+  return <UserProvider token={token}>{children}</UserProvider>;
 }

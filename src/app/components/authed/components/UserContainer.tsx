@@ -7,6 +7,7 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 import { classNames } from "../../../../../lib/functions/classNames";
 import { useUserContext } from "@/app/app/components/UserContext";
 import Link from "next/link";
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 
 const navigation = [
   { name: "Home", href: "/app/home", icon: HomeIcon, count: 0 },
@@ -96,22 +97,49 @@ export const UserContainer = () => {
               ))}
             </ul>
           </li>
-          <li className="-mx-6 mt-auto absolute bottom-0 bg-gray-50 w-full border-r">
-            <a
-              href="#"
-              className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50"
-            >
-              <img
-                alt="Your profile picture"
-                src={userData.athelete_info.profile_medium}
-                className="h-8 w-8 rounded-full bg-gray-50"
-              />
-              <span className="sr-only">Your profile</span>
-              <span aria-hidden="true">
-                {userData.athelete_info.firstname}{" "}
-                {userData.athelete_info.lastname}{" "}
-              </span>
-            </a>
+
+          <li className="-mx-6 mt-auto  bottom-0 bg-gray-50 w-auto overflow-hidden ">
+            <Popover className="relative ">
+              <PopoverButton className="w-full outline-none">
+                <div className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-50">
+                  <img
+                    alt="Your profile picture"
+                    src={userData.athelete_info.profile_medium}
+                    className="h-8 w-8 rounded-full bg-gray-50"
+                  />
+                  <span className="sr-only">Your profile</span>
+                  <span aria-hidden="true">
+                    {userData.athelete_info.firstname}{" "}
+                    {userData.athelete_info.lastname}{" "}
+                  </span>
+                </div>
+              </PopoverButton>
+              <PopoverPanel
+                transition
+                anchor="bottom"
+                className="divide-y divide-black/5 rounded-xl text-sm/6 transition duration-200 ease-in-out [--anchor-gap:var(--spacing-5)] data-[closed]:-translate-y-1 data-[closed]:opacity-0 z-50 w-72 "
+              >
+                {/* <div className="p-3">
+                  <a
+                    className="block rounded-lg py-2 px-3 transition hover:bg-black/5"
+                    href="#"
+                  >
+                    <p className="font-semibold text-black">Insights</p>
+                    <p className="text-black/50">
+                      Measure actions your users take
+                    </p>
+                  </a>
+                </div> */}
+                <div className="p-2">
+                  <Link
+                    className="block rounded-lg p-2 w-full bg-white border shadow transition hover:bg-black/10"
+                    href="/auth/logout"
+                  >
+                    <p className="font-semibold text-black">Log Out</p>
+                  </Link>
+                </div>
+              </PopoverPanel>
+            </Popover>
           </li>
         </ul>
       </nav>
