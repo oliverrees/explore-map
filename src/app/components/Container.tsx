@@ -10,7 +10,7 @@ export const Container = ({
   children,
   dark = false,
   topPadding = true,
-  customPadding = false,
+  customPadding,
   background,
 }: ContainerProps) => {
   const darkMode = background
