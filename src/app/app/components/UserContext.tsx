@@ -75,19 +75,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     <UserContext.Provider
       value={{ loading, userData, mapData, fetchMapData, supabase }}
     >
-      <div className="w-full flex">
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-          <UserContainer />
-        </div>
-        <div className="lg:pl-72 w-full relative min-h-screen">
-          <div
-            style={{
-              backgroundImage: `url(${grid.src})`,
-            }}
-            className="absolute top-0 lg:right-0 lg:w-full w-full lg:h-full h-full -z-10 bg-repeat opacity-50"
-          />
-          {children}
-        </div>
+      <div className="w-full">
+        <UserContainer>{children}</UserContainer>
       </div>
     </UserContext.Provider>
   );

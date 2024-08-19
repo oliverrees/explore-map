@@ -47,7 +47,7 @@ export const Hero = ({}: HeroProps) => {
                 Share your adventures with the world
               </h1>
               <div className="text-md md:text-lg xl:text-xl mt-3 md:mt-4 leading-6 font-light xl:leading-8 xl:w-10/12">
-                Visualise your runs, rides and hikes on an interactive map to
+                Select and group runs, rides or hikes on an interactive map to
                 share with your friends
               </div>
               <div className="flex gap-20 items-center flex-col lg:flex-row gap-x-12 gap-y-3 w-full mt-6 md:mt-8 lg:mt-10 h-auto">

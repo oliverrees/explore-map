@@ -25,7 +25,7 @@ const types = [
 
 export default function MapType() {
   return (
-    <div className="h-screen flex flex-col items-center justify-center">
+    <div className="md:h-full md:flex flex-col md:items-center md:justify-center px-8 md:px-0 pb-12">
       <div className="flex flex-col w-full max-w-md mx-auto text-center">
         <h3 className="mt-2 text-2xl font-display font-semibold text-gray-900">
           Select a map type
@@ -34,7 +34,7 @@ export default function MapType() {
           What kind of map would you like to create?
         </p>
       </div>
-      <div className="max-w-5xl mx-auto flex w-full gap-4 mt-6">
+      <div className="max-w-5xl mx-auto flex md:flex-row flex-col w-full gap-4 mt-6">
         {types.map(({ name, description, image, type, isLive }) => (
           <CardHolder key={type}>
             <div
@@ -43,7 +43,7 @@ export default function MapType() {
                 opacity: isLive ? 1 : 0.25,
               }}
             >
-              <Image src={image} alt={name} className="h-56 w-auto" />
+              <Image src={image} alt={name} className="lg:h-56 h-24 w-auto" />
               <h3 className="mt-2 text-xl font-display font-semibold text-gray-900">
                 {name}
               </h3>

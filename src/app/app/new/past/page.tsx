@@ -249,7 +249,7 @@ export default function ActivitiesTable() {
             </button>
           </div>
           <CardHolder classNames="relative overflow-auto">
-            <table className="min-w-full table-fixed">
+            <table className="min-w-full table-fixed font-light">
               <TableHeader
                 sortConfig={sortConfig}
                 handleSort={handleSort}

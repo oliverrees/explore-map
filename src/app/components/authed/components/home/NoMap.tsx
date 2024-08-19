@@ -5,8 +5,8 @@ import Link from "next/link";
 
 export const NoMap = () => {
   return (
-    <div className="text-center h-screen flex flex-col items-center justify-center">
-      <Image src={map} alt="Terrain" className="h-96 w-auto" />
+    <div className="text-center h-full flex flex-col items-center justify-center">
+      <Image src={map} alt="Terrain" className="px-4 lg:h-96 w-auto" />
       <h3 className="mt-2 text-2xl font-display font-semibold text-gray-900">
         Create an ExploreMap
       </h3>
