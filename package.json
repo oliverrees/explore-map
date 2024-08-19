@@ -16,13 +16,16 @@
     "@supabase/supabase-js": "^2.45.1",
     "@tailwindcss/forms": "^0.5.7",
     "date-fns": "^3.6.0",
+    "framer-motion": "^11.3.28",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "next": "14.2.5",
+    "nextjs-toploader": "^1.6.12",
     "react": "^18",
     "react-dom": "^18",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "react-transition-progress": "^0.0.4"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

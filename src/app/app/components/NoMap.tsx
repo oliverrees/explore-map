@@ -2,10 +2,21 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import map from "@/app/assets/img/map.png";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export const NoMap = () => {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    const height = document.documentElement?.clientHeight;
+    setHeight(height);
+  }, []);
   return (
-    <div className="text-center h-full flex flex-col items-center justify-center">
+    <div
+      className="text-center flex flex-col items-center justify-center"
+      style={{
+        height: `${height}px`,
+      }}
+    >
       <Image src={map} alt="Terrain" className="px-4 lg:h-96 w-auto" />
       <h3 className="mt-2 text-2xl font-display font-semibold text-gray-900">
         Create an ExploreMap

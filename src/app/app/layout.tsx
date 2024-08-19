@@ -1,3 +1,4 @@
+import NextTopLoader from "nextjs-toploader";
 import { cookies } from "next/headers";
 import { ReactNode } from "react";
 import { UserProvider } from "./components/UserContext"; // This will be the client-side context
@@ -9,5 +10,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     return redirect("/");
   }
 
-  return <UserProvider token={token}>{children}</UserProvider>;
+  return (
+    <>
+      <NextTopLoader showSpinner={false} />
+      <UserProvider token={token}>{children}</UserProvider>
+    </>
+  );
 }

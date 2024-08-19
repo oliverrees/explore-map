@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getSupabaseClient } from "../../../../lib/supabase/client";
-import { UserContainer } from "@/app/components/authed/components/UserContainer";
+import { UserContainer } from "./UserContainer";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 import grid from "../../assets/img/grid.png";
 

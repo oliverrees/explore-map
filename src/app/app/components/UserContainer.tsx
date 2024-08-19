@@ -1,5 +1,5 @@
 "use client";
-import grid from "../../../assets/img/grid.png";
+import grid from "../../assets/img/grid.png";
 import logo from "@/app/assets/img/logo.png";
 import Image from "next/image";
 
@@ -19,6 +19,7 @@ import {
   BellIcon,
   CalendarIcon,
   ChartPieIcon,
+  ChevronUpIcon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
   FolderIcon,
@@ -30,11 +31,11 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
-import { classNames } from "../../../../../lib/functions/classNames";
+import { classNames } from "../../../../lib/functions/classNames";
 import { usePathname } from "next/navigation";
 import { useUserContext } from "@/app/app/components/UserContext";
 import Link from "next/link";
-import { LoadingSpinner } from "../../LoadingSpinner";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
 
 const navigation = [
   { name: "Home", href: "/app/home", icon: HomeIcon, count: 0 },
@@ -47,13 +48,9 @@ const userNavigation = [
 export const UserContainer = ({ children }: { children: React.ReactNode }) => {
   const { userData, mapData } = useUserContext();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [height, setHeight] = useState(0);
+
   const pathname = usePathname();
   const currentPage = pathname.split("/").pop();
-  useEffect(() => {
-    const height = document.documentElement?.clientHeight;
-    setHeight(height);
-  }, []);
 
   return (
     <>
@@ -163,7 +160,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                         ))}
                       </ul>
                     </li>
-                    <li className="mt-auto">
+                    {/* <li className="mt-auto">
                       <Link
                         href="#"
                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-blue-200 hover:bg-blue-700 hover:text-white"
@@ -174,7 +171,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                         />
                         Settings
                       </Link>
-                    </li>
+                    </li> */}
                   </ul>
                 </nav>
               </div>
@@ -205,7 +202,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                           className={classNames(
                             currentPage === item.href.split("/").pop()
                               ? "bg-blue-700 text-white"
-                              : "text-blue-200 hover:bg-blue-700 hover:text-white",
+                              : "text-blue-700 hover:bg-blue-700 hover:text-white",
                             "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
                           )}
                         >
@@ -260,30 +257,54 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                   </ul>
                 </li>
                 <li className="mt-auto">
-                  <Link
-                    href="#"
-                    className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-blue-200 hover:bg-blue-700 hover:text-white"
-                  >
-                    <Cog6ToothIcon
-                      aria-hidden="true"
-                      className="h-6 w-6 shrink-0 text-blue-200 group-hover:text-white"
-                    />
-                    Settings
-                  </Link>
+                  <Menu as="div" className="relative">
+                    <MenuItems
+                      transition
+                      className="absolute bottom-16 -left-2 z-10 mt-2.5 w-64 origin-bottom-left rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                    >
+                      {userNavigation.map((item) => (
+                        <MenuItem key={item.name}>
+                          <Link
+                            onClick={() => setSidebarOpen(false)}
+                            href={item.href}
+                            className="block px-3 py-1 text-sm leading-6 text-gray-900 data-[focus]:bg-gray-50"
+                          >
+                            {item.name}
+                          </Link>
+                        </MenuItem>
+                      ))}
+                    </MenuItems>
+                    <MenuButton className="-m-1.5 flex items-center p-1.5">
+                      <Image
+                        alt=""
+                        src={userData.athelete_info.profile_medium}
+                        height={32}
+                        width={32}
+                        className="rounded-full bg-gray-50"
+                      />
+                      <div className="hidden lg:flex lg:items-center">
+                        <span
+                          aria-hidden="true"
+                          className="ml-4 text-sm font-semibold leading-6 text-gray-900"
+                        >
+                          {userData.athelete_info.firstname}&nbsp;
+                          {userData.athelete_info.lastname}
+                        </span>
+                        <ChevronUpIcon
+                          aria-hidden="true"
+                          className="ml-2 h-5 w-5 text-gray-400"
+                        />
+                      </div>
+                    </MenuButton>
+                  </Menu>
                 </li>
               </ul>
             </nav>
           </div>
         </div>
 
-        <div
-          className="lg:pl-72 flex flex-col w-full relative overflow-auto"
-          style={{
-            height: `${height}px`,
-            backgroundImage: `url(${grid.src})`,
-          }}
-        >
-          <div className="fixed md:sticky w-full bg-white shadow-sm md:shadow-none border-b top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="lg:pl-72 flex flex-col w-full relative overflow-auto ">
+          <div className="fixed md:sticky w-full bg-white shadow-sm md:shadow-none border-b top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:hidden">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
@@ -299,7 +320,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
               className="h-6 w-px bg-gray-900/10 lg:hidden"
             /> */}
 
-            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 ">
               <div className="w-full h-full" />
               {/* <form action="#" method="GET" className="relative flex flex-1">
                 <label htmlFor="search-field" className="sr-only">
@@ -378,9 +399,15 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
 
-          <div className="h-full mt-20 md:pt-0">
-            <Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
-          </div>
+          <div
+            className="fixed top-0 left-0 -z-10 w-full h-full "
+            style={{
+              backgroundImage: `url(${grid.src})`,
+              backgroundRepeat: "repeat",
+            }}
+          />
+
+          <div className="h-full">{children}</div>
         </div>
       </div>
     </>
