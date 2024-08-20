@@ -40,7 +40,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   const fetchMapData = async () => {
     const { data: mapData, error: mapError } = await supabase
       .from("exploremap_maps")
-      .select("map_id, map_name");
+      .select("map_id, map_name, slug");
 
     if (mapData) {
       setMapData(mapData);

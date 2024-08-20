@@ -8,7 +8,7 @@ import { MapSettings } from "./components/MapSettings";
 import { useUserContext } from "../../components/UserContext";
 import { LoadingSpinner } from "@/app/components/LoadingSpinner";
 
-const Map = dynamic(() => import("../../components/map/Map"), {
+const Map = dynamic(() => import("../../../components/map/Map"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-full">
@@ -25,18 +25,16 @@ interface Activity {
 
 export default function MapPage() {
   const params = useParams();
-  const mapId = params.mapId;
+  const mapSlug = params.mapSlug;
   const { supabase } = useUserContext();
 
   const [data, setData] = useState({
-    isShared: false,
-    created: "",
-    id: "",
+    mapData: null,
     allCoords: [],
     activityIds: [],
     totalDistance: 0,
     lastDistance: 0,
-    rawData: [],
+    activitiesData: [],
     totalTime: 0,
     totalElevationGain: 0,
   });
@@ -45,7 +43,7 @@ export default function MapPage() {
 
   useEffect(() => {
     const fetchMapData = async () => {
-      if (!mapId) {
+      if (!mapSlug) {
         return;
       }
       try {
@@ -53,7 +51,7 @@ export default function MapPage() {
         const { data: mapData, error: mapError } = await supabase
           .from("exploremap_maps")
           .select("*")
-          .eq("map_id", mapId)
+          .eq("slug", mapSlug)
           .single();
 
         if (mapError) throw new Error(mapError.message);
@@ -63,7 +61,7 @@ export default function MapPage() {
         // Fetch the activities details from the exploremap_activities table
         const { data: activitiesData, error: activitiesError } = await supabase
           .from("exploremap_activities")
-          .select("activity_data, activity_id")
+          .select("*")
           .in("activity_id", mapActivities);
 
         if (activitiesError) throw new Error(activitiesError.message);
@@ -102,14 +100,12 @@ export default function MapPage() {
         );
 
         setData({
-          isShared: mapData.is_shared,
-          created: mapData.created_at,
-          id: mapData.map_id,
+          mapData,
           allCoords,
           activityIds,
           totalDistance,
           lastDistance: totalDistance, // Assuming the last distance is the total
-          rawData: activitiesData,
+          activitiesData: activitiesData,
           totalTime,
           totalElevationGain,
         });
@@ -121,18 +117,18 @@ export default function MapPage() {
     };
 
     fetchMapData();
-  }, [mapId]);
+  }, [mapSlug]);
 
-  if (!data.id && !loading) {
+  if (!data.mapData && !loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full mt-24">
         Map not found
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen ">
       {loading ? (
         <div className="flex items-center justify-center h-full">
           <LoadingSpinner />
@@ -140,7 +136,9 @@ export default function MapPage() {
       ) : (
         <>
           <MapSettings data={data} />
-          <Map data={data} />
+          <div className="h-[50rem] pb-20 lg:pb-0 lg:h-full">
+            <Map data={data} />
+          </div>
         </>
       )}
     </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import PolylineSvg from "../../../components/PolylineSvg";
+import PolylineSvg from "../../components/PolylineSvg";
 
 interface TableRowProps {
   activity: any;

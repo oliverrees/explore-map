@@ -48,9 +48,12 @@ const userNavigation = [
 export const UserContainer = ({ children }: { children: React.ReactNode }) => {
   const { userData, mapData } = useUserContext();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const pathname = usePathname();
   const currentPage = pathname.split("/").pop();
+  // on page change scroll to top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <>
@@ -106,8 +109,8 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                               className={classNames(
                                 currentPage === item.href.split("/").pop()
                                   ? "bg-blue-700 text-white"
-                                  : "text-blue-200 hover:bg-blue-700 hover:text-white",
-                                "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
+                                  : "text-blue-500 hover:bg-blue-700 hover:text-white",
+                                "group flex gap-x-3 bg-blue-50 rounded-md p-2 text-sm font-semibold leading-6"
                               )}
                             >
                               <item.icon
@@ -115,7 +118,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                                 className={classNames(
                                   currentPage === item.href.split("/").pop()
                                     ? "text-white"
-                                    : "text-blue-200 group-hover:text-white",
+                                    : "text-blue-500 group-hover:text-white",
                                   "h-6 w-6 shrink-0"
                                 )}
                               />
@@ -136,9 +139,9 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                           <li key={map.map_id}>
                             <Link
                               onClick={() => setSidebarOpen(false)}
-                              href={`/app/map/${map.map_id}`}
+                              href={`/app/map/${map.slug}`}
                               className={classNames(
-                                currentPage === map.map_id
+                                currentPage === map.slug
                                   ? "bg-gray-50 text-blue-600"
                                   : "text-gray-700 hover:bg-gray-50 hover:text-blue-600",
                                 "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -146,15 +149,15 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                             >
                               <span
                                 className={classNames(
-                                  currentPage === map.map_id
+                                  currentPage === map.slug
                                     ? "border-blue-600 text-blue-600"
                                     : "border-gray-200 text-gray-400 group-hover:border-blue-600 group-hover:text-blue-600",
                                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
                                 )}
                               >
-                                {map.map_id.charAt(0)}
+                                {map.slug.charAt(0).toUpperCase()}
                               </span>
-                              <span className="truncate">{map.map_id}</span>
+                              <span className="truncate">{map.map_name}</span>
                             </Link>
                           </li>
                         ))}
@@ -232,9 +235,9 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                       <li key={map.map_id}>
                         <Link
                           onClick={() => setSidebarOpen(false)}
-                          href={`/app/map/${map.map_id}`}
+                          href={`/app/map/${map.slug}`}
                           className={classNames(
-                            currentPage === map.map_id
+                            currentPage === map.slug
                               ? "bg-gray-50 text-blue-600"
                               : "text-gray-700 hover:bg-gray-50 hover:text-blue-600",
                             "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -242,15 +245,15 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                         >
                           <span
                             className={classNames(
-                              currentPage === map.map_id
+                              currentPage === map.slug
                                 ? "border-blue-600 text-blue-600"
                                 : "border-gray-200 text-gray-400 group-hover:border-blue-600 group-hover:text-blue-600",
                               "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
                             )}
                           >
-                            {map.map_id.charAt(0)}
+                            {map.slug.charAt(0).toUpperCase()}
                           </span>
-                          <span className="truncate">{map.map_id}</span>
+                          <span className="truncate">{map.map_name}</span>
                         </Link>
                       </li>
                     ))}
@@ -304,7 +307,8 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         <div className="lg:pl-72 flex flex-col w-full relative overflow-auto ">
-          <div className="fixed md:sticky w-full bg-white shadow-sm md:shadow-none border-b top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:hidden">
+          <div className="fixed lg:sticky w-full bg-white shadow-sm md:shadow-none border-b top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:hidden">
+            {/* <Image alt="Explore Map Logo" src={logo} className="h-8 w-auto" /> */}
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}

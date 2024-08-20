@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <NextTopLoader showSpinner={false} />
+      <NextTopLoader showSpinner={false} color="rgb(37 99 235)" zIndex={100} />
       <UserProvider token={token}>{children}</UserProvider>
     </>
   );

@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { useUserContext } from "../../components/UserContext";
 import { LoadingSpinner } from "@/app/components/LoadingSpinner";
-import TableHeader from "./components/TableHeader";
-import TableRow from "./components/TableRow";
-import Pagination from "./components/Pagination";
+import TableHeader from "../components/TableHeader";
+import TableRow from "../components/TableRow";
+import Pagination from "../components/Pagination";
 import { CardHolder } from "../../components/CardHolder";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
 import { MapIcon } from "@heroicons/react/24/outline";
@@ -13,6 +13,7 @@ import { TitleBlock } from "@/app/components/TitleBlock";
 import { AppTitleBlock } from "../../components/AppTitleBlock";
 import { UserMaxWidth } from "../../components/UserMaxWidth";
 import { generateMapId } from "../lib/generateMapId";
+import { ChooseName } from "../components/ChooseName";
 
 interface Activity {
   id: number;
@@ -26,6 +27,7 @@ export default function ActivitiesTable() {
   const { userData, supabase, fetchMapData } = useUserContext();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [chooseNameOpen, setChooseNameOpen] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>(
     "Fetching activities from Strava..."
   );
@@ -171,103 +173,127 @@ export default function ActivitiesTable() {
     await syncActivitiesWithStrava(true);
   };
 
-  const createMap = async () => {
+  const createMap = async (name: string) => {
     setLoading(true);
     setLoadingMessage("Creating map...");
     const mapId = generateMapId();
-    const { error } = await supabase.from("exploremap_maps").insert({
-      strava_id: userData.strava_id,
-      unique_id: userData.unique_id,
-      map_id: mapId,
-      map_activities: selectedActivities,
-    });
+
+    // Insert the new map and return the slug
+    const { data, error } = await supabase
+      .from("exploremap_maps")
+      .insert({
+        strava_id: userData.strava_id,
+        unique_id: userData.unique_id,
+        map_id: mapId,
+        map_activities: selectedActivities,
+        map_name: name,
+      })
+      .select("slug")
+      .single();
+
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
       fetchMapData();
-      router.push(`/app/map/${mapId}`);
+      const mapSlug = data.slug; // Get the slug from the inserted map
+      router.push(`/app/map/${mapSlug}`); // Redirect to the slug-based URL
     }
   };
 
   return (
-    <UserMaxWidth>
-      <div className="h-screen flex flex-col justify-between pb-6 gap-4">
-        <AppTitleBlock
-          title="Select Activities"
-          description="Select the activities you want to include in your ExploreMap"
-        />
-        {loading ? (
-          <>
-            <div className="flex justify-center items-center h-full w-full py-12 flex-col">
-              <LoadingSpinner />
-              <p className="mt-4 text-gray-500">{loadingMessage}</p>
-            </div>
-          </>
-        ) : (
-          <>
-            {error && (
-              <CardHolder classNames="p-4 text-center">
-                <div className="text-red-500">ERROR: {error}</div>
+    <>
+      <ChooseName
+        isOpen={chooseNameOpen}
+        onConfirm={(name) => {
+          createMap(name);
+          setChooseNameOpen(false);
+        }}
+        onCancel={() => setChooseNameOpen(false)}
+      />
+      <UserMaxWidth>
+        <div className="h-screen flex flex-col justify-between pb-6 gap-4">
+          <AppTitleBlock
+            title="Select Activities"
+            description="Select the activities you want to include in your ExploreMap"
+          />
+          {loading ? (
+            <>
+              <div className="flex justify-center items-center h-full w-full py-12 flex-col">
+                <LoadingSpinner />
+                <p className="mt-4 text-gray-500">{loadingMessage}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              {error && (
+                <CardHolder classNames="p-4 text-center">
+                  <div className="text-red-500">ERROR: {error}</div>
+                </CardHolder>
+              )}
+
+              <CardHolder classNames="relative overflow-auto">
+                <table className="min-w-full table-fixed font-light">
+                  <TableHeader
+                    sortConfig={sortConfig}
+                    handleSort={handleSort}
+                    isAllSelected={
+                      selectedActivities.length === activities.length
+                    } // Pass the state to the header
+                    handleSelectAll={handleSelectAll} // Pass the select all handler to the header
+                  />
+                  <tbody className="divide-y divide-gray-200 bg-white ">
+                    {paginatedActivities.map((activity) => (
+                      <TableRow
+                        key={activity.activity_id}
+                        activity={activity}
+                        selected={selectedActivities.includes(
+                          activity.activity_id
+                        )}
+                        onSelect={handleSelectActivity}
+                      />
+                    ))}
+                  </tbody>
+                </table>
               </CardHolder>
-            )}
-            <div className="flex justify-center pb-2 gap-4">
-              <button
-                type="button"
-                onClick={handleSyncButtonClick}
-                className="block rounded-md border-gray-500 bg-white border px-3 py-1.5 text-center text-sm font-semibold leading-6 text-black shadow-sm w-full"
-              >
-                <ArrowPathIcon className="h-5 w-5 inline-block -mt-0.5 mr-2" />
-                Sync activities from Strava
-              </button>
-              <button
-                disabled={selectedActivities.length === 0}
-                style={{
-                  cursor: selectedActivities.length === 0 ? "not-allowed" : "",
-                  opacity: selectedActivities.length === 0 ? 0.5 : 1,
-                }}
-                type="button"
-                onClick={createMap}
-                className="block rounded-md bg-blue-600 px-6 py-2 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full"
-              >
-                <MapIcon className="h-5 w-5 inline-block -mt-0.5 mr-2" />
-                Create Map
-              </button>
-            </div>
-            <CardHolder classNames="relative overflow-auto">
-              <table className="min-w-full table-fixed font-light">
-                <TableHeader
-                  sortConfig={sortConfig}
-                  handleSort={handleSort}
-                  isAllSelected={
-                    selectedActivities.length === activities.length
-                  } // Pass the state to the header
-                  handleSelectAll={handleSelectAll} // Pass the select all handler to the header
+              <div className="flex justify-center pb-2 gap-4">
+                <button
+                  type="button"
+                  onClick={handleSyncButtonClick}
+                  className="block rounded-md border-gray-500 bg-white border px-3 py-1.5 text-center text-sm font-semibold leading-6 text-black shadow-sm w-full"
+                >
+                  <ArrowPathIcon className="h-5 w-5 inline-block -mt-0.5 mr-2" />
+                  Sync{" "}
+                  <span className="hidden md:inline-block">
+                    activities from Strava
+                  </span>
+                </button>
+                <button
+                  disabled={selectedActivities.length === 0}
+                  style={{
+                    cursor:
+                      selectedActivities.length === 0 ? "not-allowed" : "",
+                    opacity: selectedActivities.length === 0 ? 0.5 : 1,
+                  }}
+                  type="button"
+                  onClick={() => setChooseNameOpen(true)}
+                  className="block rounded-md bg-blue-600 px-6 py-2 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 w-full"
+                >
+                  <MapIcon className="h-5 w-5 inline-block -mt-0.5 mr-2" />
+                  Create Map
+                </button>
+              </div>
+              <div className="mt-4 flex justify-center w-full">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(activities.length / activitiesPerPage)}
+                  onPageChange={handlePageChange}
                 />
-                <tbody className="divide-y divide-gray-200 bg-white ">
-                  {paginatedActivities.map((activity) => (
-                    <TableRow
-                      key={activity.activity_id}
-                      activity={activity}
-                      selected={selectedActivities.includes(
-                        activity.activity_id
-                      )}
-                      onSelect={handleSelectActivity}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </CardHolder>
-            <div className="mt-4 flex justify-center w-full">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={Math.ceil(activities.length / activitiesPerPage)}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          </>
-        )}
-      </div>
-    </UserMaxWidth>
+              </div>
+            </>
+          )}
+        </div>
+      </UserMaxWidth>
+    </>
   );
 }

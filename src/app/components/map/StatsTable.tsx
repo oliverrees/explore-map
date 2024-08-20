@@ -2,7 +2,7 @@
 import { Switch } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { format, addDays } from "date-fns";
-import { secondsToHMS } from "../../../../../lib/functions/secondsToHMS";
+import { secondsToHMS } from "../../../../lib/functions/secondsToHMS";
 interface Props {
   data: any;
   onChangeShowPins: (pinStatus: boolean) => void;

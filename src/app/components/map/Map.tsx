@@ -19,6 +19,9 @@ const Map = ({ data }: Props) => {
   const coords = data.allCoords;
   const activityIds = data.activityIds;
 
+  if (!data) return null;
+  if (coords.length === 0) return null;
+
   const tileUrl = showSatellite
     ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
     : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
@@ -82,7 +85,7 @@ const Map = ({ data }: Props) => {
                     })}
                     eventHandlers={{
                       click: (e) => {
-                        setActivityData(data.rawData[i]?.activity_data);
+                        setActivityData(data.activitiesData[i]?.activity_data);
                         setActivityId(activityIds[i]);
                         setTimeout(() => setOpen(true), 100);
                       },

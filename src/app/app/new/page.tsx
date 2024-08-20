@@ -60,6 +60,15 @@ export default function MapType() {
           </CardHolder>
         ))}
       </div>
+      <div className="text-center font-normal text-xs mt-4">
+        <p className="text-gray-500">
+          <span className="font-semibold">
+            Not sure which map type to pick?
+          </span>{" "}
+          If you want to create a map with a mix of past and future activities,
+          select a past map and set up future activities later.
+        </p>
+      </div>
     </UserMaxWidth>
   );
 }
