@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAccessToken, refreshStravaToken } from "../../lib/stravaUtils";
 import { supabase } from "../../../../../lib/supabase/supabaseService";
+import { updateMapsWithNewActivity } from "./updateMapsWithNewActivity";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -25,6 +26,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const eventData = await request.json();
   const { object_type, aspect_type, object_id, owner_id, updates } = eventData;
+
+  console.log(eventData);
 
   try {
     // Fetch the user's token data from the database
@@ -107,6 +110,16 @@ export async function POST(request: Request) {
         {
           onConflict: "activity_id",
         }
+      );
+
+      // Extract activity start time and convert it to a Date object
+      const activityStartTime = new Date(activityDataProcessed.start_date);
+
+      // Call the function to update maps
+      await updateMapsWithNewActivity(
+        owner_id,
+        activityDataProcessed.id,
+        activityStartTime
       );
 
       console.log(`Activity ${aspect_type}d with ID: ${object_id}`);

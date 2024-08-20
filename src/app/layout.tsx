@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { NextUIProvider } from "@nextui-org/react";
 
 const ibmMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -24,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${ibmMono.className} ${inter.className} `}>
-        {children}
+        <NextUIProvider>{children}</NextUIProvider>
       </body>
     </html>
   );

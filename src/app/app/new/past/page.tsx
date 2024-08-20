@@ -12,15 +12,7 @@ import { useRouter } from "next/navigation";
 import { TitleBlock } from "@/app/components/TitleBlock";
 import { AppTitleBlock } from "../../components/AppTitleBlock";
 import { UserMaxWidth } from "../../components/UserMaxWidth";
-
-function makeid() {
-  var text = "";
-  var possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i = 0; i < 10; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  return text.toUpperCase();
-}
+import { generateMapId } from "../lib/generateMapId";
 
 interface Activity {
   id: number;
@@ -182,7 +174,7 @@ export default function ActivitiesTable() {
   const createMap = async () => {
     setLoading(true);
     setLoadingMessage("Creating map...");
-    const mapId = makeid();
+    const mapId = generateMapId();
     const { error } = await supabase.from("exploremap_maps").insert({
       strava_id: userData.strava_id,
       unique_id: userData.unique_id,
@@ -219,14 +211,14 @@ export default function ActivitiesTable() {
                 <div className="text-red-500">ERROR: {error}</div>
               </CardHolder>
             )}
-            <div className="flex justify-center p-2 gap-4">
+            <div className="flex justify-center pb-2 gap-4">
               <button
                 type="button"
                 onClick={handleSyncButtonClick}
                 className="block rounded-md border-gray-500 bg-white border px-3 py-1.5 text-center text-sm font-semibold leading-6 text-black shadow-sm w-full"
               >
                 <ArrowPathIcon className="h-5 w-5 inline-block -mt-0.5 mr-2" />
-                Get new Activities
+                Sync activities from Strava
               </button>
               <button
                 disabled={selectedActivities.length === 0}
