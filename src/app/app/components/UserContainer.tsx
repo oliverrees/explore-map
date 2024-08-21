@@ -50,6 +50,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const currentPage = pathname.split("/").pop();
+  const mapPage = pathname.split("/")[3];
   // on page change scroll to top
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -141,7 +142,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                               onClick={() => setSidebarOpen(false)}
                               href={`/app/map/${map.slug}`}
                               className={classNames(
-                                currentPage === map.slug
+                                mapPage === map.slug
                                   ? "bg-gray-50 text-blue-600"
                                   : "text-gray-700 hover:bg-gray-50 hover:text-blue-600",
                                 "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -149,7 +150,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                             >
                               <span
                                 className={classNames(
-                                  currentPage === map.slug
+                                  mapPage === map.slug
                                     ? "border-blue-600 text-blue-600"
                                     : "border-gray-200 text-gray-400 group-hover:border-blue-600 group-hover:text-blue-600",
                                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
@@ -237,7 +238,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                           onClick={() => setSidebarOpen(false)}
                           href={`/app/map/${map.slug}`}
                           className={classNames(
-                            currentPage === map.slug
+                            mapPage === map.slug
                               ? "bg-gray-50 text-blue-600"
                               : "text-gray-700 hover:bg-gray-50 hover:text-blue-600",
                             "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -245,7 +246,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                         >
                           <span
                             className={classNames(
-                              currentPage === map.slug
+                              mapPage === map.slug
                                 ? "border-blue-600 text-blue-600"
                                 : "border-gray-200 text-gray-400 group-hover:border-blue-600 group-hover:text-blue-600",
                               "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
@@ -307,7 +308,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         <div className="lg:pl-72 flex flex-col w-full relative overflow-auto ">
-          <div className="fixed lg:sticky w-full bg-white shadow-sm md:shadow-none border-b top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:hidden">
+          <div className="fixed lg:sticky w-full bg-white md:shadow-none top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  px-4 sm:gap-x-6 sm:px-6 lg:px-8 lg:hidden">
             {/* <Image alt="Explore Map Logo" src={logo} className="h-8 w-auto" /> */}
             <button
               type="button"
