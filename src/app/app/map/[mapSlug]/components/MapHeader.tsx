@@ -15,6 +15,16 @@ export const MapHeader = ({}: MapHeaderProps) => {
       href: `${baseUrl}/sharing`,
       description: "Configure sharing settings for this map",
     },
+    {
+      name: "Activities",
+      href: `${baseUrl}/activities`,
+      description: "Choose which activities are on this map",
+    },
+    {
+      name: "Live",
+      href: `${baseUrl}/live`,
+      description: "Change the live status of this map",
+    },
   ];
   const pathname = usePathname();
   const currentPage = secondaryNavigation.find(

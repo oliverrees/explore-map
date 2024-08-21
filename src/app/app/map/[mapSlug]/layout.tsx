@@ -10,53 +10,59 @@ import { MapHeader } from "./components/MapHeader";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const params = useParams();
-  const mapSlug = params.mapSlug;
+  const mapSlug = params.mapSlug.toString();
   const [height, setHeight] = useState(0);
   const { supabase } = useUserContext();
-  useEffect(() => {
-    const height = document.documentElement?.clientHeight;
-    setHeight(height);
-  }, []);
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMapData = async () => {
-      if (!mapSlug) {
-        return;
-      }
-      try {
-        const { data: mapData, error: mapError } = await supabase
-          .from("exploremap_maps")
-          .select("*")
-          .eq("slug", mapSlug)
-          .single();
+    const height = document.documentElement?.clientHeight;
+    setHeight(height);
+  }, []);
 
-        if (mapError) throw new Error(mapError.message);
+  const updateMapData = async (slug: string) => {
+    if (!slug) return;
 
-        const { data: activitiesData, error: activitiesError } = await supabase
-          .from("exploremap_activities")
-          .select("*")
-          .in("activity_id", mapData.map_activities);
+    setLoading(true);
+    try {
+      const { data: mapData, error: mapError } = await supabase
+        .from("exploremap_maps")
+        .select("*")
+        .eq("slug", slug)
+        .single();
 
-        if (activitiesError) throw new Error(activitiesError.message);
+      if (mapError) throw new Error(mapError.message);
 
-        const processedData = processMapData(mapData, activitiesData);
-        setData(processedData);
-      } catch (error) {
-        console.error("Error loading map data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const { data: activitiesData, error: activitiesError } = await supabase
+        .from("exploremap_activities")
+        .select("*")
+        .in("activity_id", mapData.map_activities);
 
-    fetchMapData();
+      if (activitiesError) throw new Error(activitiesError.message);
+
+      const processedData = processMapData(mapData, activitiesData);
+      setData(processedData);
+    } catch (error) {
+      console.error("Error loading map data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial load with the current mapSlug
+  useEffect(() => {
+    updateMapData(mapSlug);
   }, [mapSlug]);
 
   return (
-    <MapDataProvider data={data} loading={loading}>
+    <MapDataProvider
+      data={data}
+      loading={loading}
+      updateMapData={updateMapData}
+    >
       <div
-        className="flex w-full flex-col h-full"
+        className="flex w-full flex-col justify-start"
         style={{
           height: `${height}px`,
         }}

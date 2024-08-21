@@ -3,6 +3,7 @@ import React, { createContext, useContext } from "react";
 interface MapDataContextType {
   data: any;
   loading: boolean;
+  updateMapData: (mapSlug: string) => Promise<void>;
 }
 
 const MapDataContext = createContext<MapDataContextType | undefined>(undefined);
@@ -18,10 +19,11 @@ export const useMapData = () => {
 export const MapDataProvider: React.FC<{
   data: any;
   loading: boolean;
+  updateMapData: (mapSlug: string) => Promise<void>;
   children: React.ReactNode;
-}> = ({ data, loading, children }) => {
+}> = ({ data, loading, updateMapData, children }) => {
   return (
-    <MapDataContext.Provider value={{ data, loading }}>
+    <MapDataContext.Provider value={{ data, loading, updateMapData }}>
       {children}
     </MapDataContext.Provider>
   );

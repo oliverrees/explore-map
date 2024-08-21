@@ -52,7 +52,7 @@ export default function Sidebar({
         setActivityInfo(data);
       }
     };
-    if (Object.keys(activityData).length === 0) {
+    if (Object.keys(activityData).length === 0 && open) {
       getActivityInfo();
     } else {
       const updatedInfo = { ...activityData, id: activityId };

@@ -40,7 +40,7 @@ export default function MapPage() {
             as="span"
             className="text-xs lg:text-base font-light text-gray-500 mt-1"
           >
-            Allow anyone with the link to view your map
+            Allow people with a link to view your map
           </Description>
         </span>
         <Switch
