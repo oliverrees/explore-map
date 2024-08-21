@@ -40,7 +40,7 @@ export default async function Page({
 
       if (activitiesError) throw new Error(activitiesError.message);
 
-      return processMapData(mapData, activitiesData);
+      return processMapData(mapData, activitiesData, true);
     } catch (error) {
       console.error("Error loading map data:", error);
     }

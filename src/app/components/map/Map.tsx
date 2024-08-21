@@ -1,4 +1,5 @@
 "use client";
+import polyline from "@mapbox/polyline";
 import React, { Suspense, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
@@ -16,8 +17,11 @@ const Map = ({ data }: Props) => {
   const [activityData, setActivityData] = useState(0);
   const [activityId, setActivityId] = useState(0);
   const [showSatellite, setShowSatellite] = useState(false);
-  const coords = data.allCoords;
-  const activityIds = data.activityIds;
+
+  const coords = data.polyLines.map((line: any) => {
+    const coords = polyline.decode(line);
+    return { coords };
+  });
 
   if (!data) return null;
   if (coords.length === 0) return null;
@@ -50,6 +54,7 @@ const Map = ({ data }: Props) => {
           setOpen={setOpen}
           activityData={activityData}
           activityId={activityId}
+          mapId={data.mapData.map_id}
         />
         <MapContainer
           center={coords[0].coords[0]}
@@ -85,9 +90,15 @@ const Map = ({ data }: Props) => {
                     })}
                     eventHandlers={{
                       click: (e) => {
-                        setActivityData(data.activitiesData[i]?.activity_data);
-                        setActivityId(activityIds[i]);
-                        setTimeout(() => setOpen(true), 100);
+                        if (data.activitiesData) {
+                          setActivityData(
+                            data.activitiesData[i]?.activity_data
+                          );
+                          setActivityId(data.activitiesData[i]?.activity_id);
+                        } else {
+                          setActivityId(i);
+                        }
+                        setOpen(true);
                       },
                     }}
                     position={[

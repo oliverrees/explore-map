@@ -89,7 +89,7 @@ const StatsTable = ({
                   Total Activities
                 </td>
                 <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
-                  {data.activityIds.length}
+                  {data.totalActivities}
                 </td>
               </tr>
             </>

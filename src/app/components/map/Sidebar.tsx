@@ -4,6 +4,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { InfoWindow } from "./InfoWindow";
+import { LoadingSpinner } from "../LoadingSpinner";
 // import Weather from "./Weather";
 
 interface sidebarProps {
@@ -11,6 +12,7 @@ interface sidebarProps {
   open: boolean;
   setOpen: any;
   activityId: number;
+  mapId: string;
 }
 
 export const revalidate = 600;
@@ -21,86 +23,119 @@ export default function Sidebar({
   setOpen,
   activityData,
   activityId,
+  mapId,
 }: sidebarProps) {
   const [weather, setWeather] = useState<any>(null);
+  const [activityInfo, setActivityInfo] = useState<any>({});
 
   const closeSidebar = () => {
     setOpen(false);
     setTimeout(() => {
+      setActivityInfo({});
       setWeather(null);
     }, 500);
   };
 
-  if (!activityData.start_date) {
-    return null;
-  }
+  useEffect(() => {
+    const getActivityInfo = async () => {
+      // post response with activity id
+      const response = await fetch("/api/get-info", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ activityId, mapId }),
+      });
 
-  const stravaLink = `https://www.strava.com/activities/${activityId}`;
+      const data = await response.json();
+      if (data) {
+        setActivityInfo(data);
+      }
+    };
+    if (Object.keys(activityData).length === 0) {
+      getActivityInfo();
+    } else {
+      const updatedInfo = { ...activityData, id: activityId };
+      setActivityInfo(updatedInfo);
+    }
+  }, [activityId]);
+
+  const stravaLink = `https://www.strava.com/activities/${activityInfo?.id}`;
 
   // Define categories
   const timingStats = [
     {
       name: "Start Date",
-      value: format(new Date(activityData.start_date), "dd/MM/yyyy"),
+      value: activityInfo?.start_date
+        ? format(new Date(activityInfo?.start_date), "dd/MM/yyyy")
+        : null,
     },
     {
       name: "Moving Time",
-      value: new Date(activityData.moving_time * 1000)
-        .toISOString()
-        .substr(11, 8),
+      value: activityInfo?.moving_time
+        ? new Date(activityInfo?.moving_time * 1000).toISOString().substr(11, 8)
+        : null,
     },
     {
       name: "Total Time",
-      value: new Date(activityData.elapsed_time * 1000)
-        .toISOString()
-        .substr(11, 8),
+      value: activityInfo?.elapsed_time
+        ? new Date(activityInfo?.elapsed_time * 1000)
+            .toISOString()
+            .substr(11, 8)
+        : null,
     },
     {
       name: "Time Zone",
-      value: activityData.timezone,
+      value: activityInfo?.timezone,
     },
   ];
 
   const performanceStats = [
     {
       name: "Distance Covered",
-      value: (activityData.distance / 1000).toFixed(2),
+      value: activityInfo?.distance
+        ? (activityInfo?.distance / 1000).toFixed(2)
+        : null,
       unit: "km",
     },
     {
       name: "Average Cadence",
-      value: activityData.average_cadence,
+      value: activityInfo?.average_cadence,
       unit: "spm",
       runOnly: true,
     },
     {
       name: "Average Heart Rate",
-      value: activityData.average_heartrate,
+      value: activityInfo?.average_heartrate,
       unit: "bpm",
     },
     {
       name: "Average Power",
-      value: activityData.average_watts,
+      value: activityInfo?.average_watts,
       unit: "watts",
     },
     {
       name: "Average Speed",
-      value: (activityData.average_speed * 3.6).toFixed(2),
+      value: activityInfo?.average_speed
+        ? (activityInfo?.average_speed * 3.6).toFixed(2)
+        : null,
       unit: "km/h",
     },
     {
       name: "Max Heart Rate",
-      value: activityData.max_heartrate,
+      value: activityInfo?.max_heartrate,
       unit: "bpm",
     },
     {
       name: "Max Speed",
-      value: (activityData.max_speed * 3.6).toFixed(2),
+      value: activityInfo?.max_speed
+        ? (activityInfo?.max_speed * 3.6).toFixed(2)
+        : null,
       unit: "km/h",
     },
     {
       name: "Max Power",
-      value: activityData.max_watts,
+      value: activityInfo?.max_watts,
       unit: "watts",
     },
   ];
@@ -108,17 +143,17 @@ export default function Sidebar({
   const conditionStats = [
     {
       name: "Elevation High",
-      value: activityData.elev_high,
+      value: activityInfo?.elev_high,
       unit: "m",
     },
     {
       name: "Elevation Low",
-      value: activityData.elev_low,
+      value: activityInfo?.elev_low,
       unit: "m",
     },
     {
       name: "Elevation Gain",
-      value: activityData.total_elevation_gain,
+      value: activityInfo?.total_elevation_gain,
       unit: "m",
     },
   ];
@@ -172,113 +207,126 @@ export default function Sidebar({
                     </div>
                   </Transition.Child>
                   <div className="h-full overflow-y-auto bg-white p-8 pb-24">
-                    <div className="space-y-6">
-                      <div>
-                        <div className="mt-4 flex items-start justify-between">
-                          <div>
-                            <h2 className="font-semibold leading-6 text-3xl text-gray-900">
-                              {activityData.name}
-                            </h2>
-                            <p className="mt-3 text-sm text-gray-500">
-                              {format(
-                                new Date(activityData.start_date),
-                                "dd/MM/yyyy"
-                              )}
-                            </p>
-                          </div>
-                        </div>
+                    {Object.keys(activityInfo).length === 0 ? (
+                      <div className="text-center h-full flex justify-center items-center text-gray-500">
+                        <LoadingSpinner />
                       </div>
-
-                      {infoNotes[activityData.activity_id] && (
-                        <InfoWindow>
-                          {infoNotes[activityData.activity_id].message}{" "}
-                          <Link
-                            href={infoNotes[activityData.activity_id].link}
-                            target="new"
-                            className="underline"
-                          >
-                            Read more here
-                          </Link>
-                        </InfoWindow>
-                      )}
-
-                      <h3 className="font-medium text-gray-900">Timing</h3>
-                      <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                        {timingStats.map((stat, statIdx) => {
-                          if (stat.value === null) {
-                            return null;
-                          }
-                          return (
-                            <div
-                              className="flex justify-between py-3 text-sm font-medium"
-                              key={statIdx}
-                            >
-                              <dt className="text-gray-500">{stat.name}</dt>
-                              <dd className="text-gray-900">{stat.value}</dd>
+                    ) : (
+                      <>
+                        <div className="space-y-6">
+                          <div>
+                            <div className="mt-4 flex items-start justify-between">
+                              <div>
+                                <h2 className="font-semibold leading-6 text-3xl text-gray-900">
+                                  {activityInfo?.name}
+                                </h2>
+                                <p className="mt-3 text-sm text-gray-500">
+                                  {activityInfo?.start_date &&
+                                    format(
+                                      new Date(activityInfo?.start_date),
+                                      "dd/MM/yyyy"
+                                    )}
+                                </p>
+                              </div>
                             </div>
-                          );
-                        })}
-                      </dl>
+                          </div>
 
-                      <h3 className="font-medium text-gray-900">
-                        Performance Metrics
-                      </h3>
-                      <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                        {performanceStats.map((stat, statIdx) => {
-                          if (
-                            (stat.runOnly && activityData.type !== "Run") ||
-                            !stat.value
-                          ) {
-                            return null;
-                          }
-                          return (
-                            <div
-                              className="flex justify-between py-3 text-sm font-medium"
-                              key={statIdx}
-                            >
-                              <dt className="text-gray-500">{stat.name}</dt>
-                              <dd className="text-gray-900">
-                                {stat.value} {stat.unit}
-                              </dd>
-                            </div>
-                          );
-                        })}
-                      </dl>
+                          {infoNotes[activityInfo?.activity_id] && (
+                            <InfoWindow>
+                              {infoNotes[activityInfo?.activity_id].message}{" "}
+                              <Link
+                                href={infoNotes[activityInfo?.activity_id].link}
+                                target="new"
+                                className="underline"
+                              >
+                                Read more here
+                              </Link>
+                            </InfoWindow>
+                          )}
 
-                      <h3 className="font-medium text-gray-900">Conditions</h3>
-                      <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                        {conditionStats.map((stat, statIdx) => {
-                          if (stat.value === null) {
-                            return null;
-                          }
-                          return (
-                            <div
-                              className="flex justify-between py-3 text-sm font-medium"
-                              key={statIdx}
-                            >
-                              <dt className="text-gray-500">{stat.name}</dt>
-                              <dd className="text-gray-900">
-                                {stat.value} {stat.unit && stat.unit}
-                              </dd>
-                            </div>
-                          );
-                        })}
-                      </dl>
+                          <h3 className="font-medium text-gray-900">Timing</h3>
+                          <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                            {timingStats.map((stat, statIdx) => {
+                              if (stat.value === null) {
+                                return null;
+                              }
+                              return (
+                                <div
+                                  className="flex justify-between py-3 text-sm font-medium"
+                                  key={statIdx}
+                                >
+                                  <dt className="text-gray-500">{stat.name}</dt>
+                                  <dd className="text-gray-900">
+                                    {stat.value}
+                                  </dd>
+                                </div>
+                              );
+                            })}
+                          </dl>
 
-                      {/* {weather && (
+                          <h3 className="font-medium text-gray-900">
+                            Performance Metrics
+                          </h3>
+                          <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                            {performanceStats.map((stat, statIdx) => {
+                              if (
+                                (stat.runOnly && activityData.type !== "Run") ||
+                                !stat.value
+                              ) {
+                                return null;
+                              }
+                              return (
+                                <div
+                                  className="flex justify-between py-3 text-sm font-medium"
+                                  key={statIdx}
+                                >
+                                  <dt className="text-gray-500">{stat.name}</dt>
+                                  <dd className="text-gray-900">
+                                    {stat.value} {stat.unit}
+                                  </dd>
+                                </div>
+                              );
+                            })}
+                          </dl>
+
+                          <h3 className="font-medium text-gray-900">
+                            Conditions
+                          </h3>
+                          <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                            {conditionStats.map((stat, statIdx) => {
+                              if (stat.value === null) {
+                                return null;
+                              }
+                              return (
+                                <div
+                                  className="flex justify-between py-3 text-sm font-medium"
+                                  key={statIdx}
+                                >
+                                  <dt className="text-gray-500">{stat.name}</dt>
+                                  <dd className="text-gray-900">
+                                    {stat.value} {stat.unit && stat.unit}
+                                  </dd>
+                                </div>
+                              );
+                            })}
+                          </dl>
+
+                          {/* {weather && (
                         <Weather weather={weather} date={activityData.date} />
                       )} */}
 
-                      <div className="absolute bottom-0 left-0 right-0 w-full">
-                        <Link
-                          href={stravaLink}
-                          target="_blank"
-                          className="w-full flex justify-center bg-orange-600 px-3 py-4 text-sm font-semibold text-white text-center"
-                        >
-                          View on Strava
-                        </Link>
-                      </div>
-                    </div>
+                          <div className="absolute bottom-0 left-0 right-0 w-full">
+                            <Link
+                              href={stravaLink}
+                              target="_blank"
+                              className="w-full flex justify-center bg-orange-600 px-3 py-4 text-sm font-semibold text-white text-center"
+                            >
+                              View on Strava
+                            </Link>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
