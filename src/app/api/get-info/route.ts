@@ -29,14 +29,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Map Error" }, { status: 500 });
     }
 
-    const activityIds = map.map_activities;
-    const realActivityId = activityIds[activityId];
+    // Check activty id is in map
+    if (!map?.map_activities.includes(activityId)) {
+      return NextResponse.json(
+        { error: "Activity not in map" },
+        { status: 404 }
+      );
+    }
 
     // Fetch activity from Supabase
     const { data: activity, error } = await supabase
       .from("exploremap_activities")
       .select("*")
-      .eq("activity_id", realActivityId)
+      .eq("activity_id", activityId)
       .single();
 
     if (error) {

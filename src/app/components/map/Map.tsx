@@ -129,7 +129,7 @@ const Map = ({ data, isPublic = true }: Props) => {
                             );
                             setActivityId(data.activitiesData[i]?.activity_id);
                           } else {
-                            setActivityId(i);
+                            setActivityId(data.activityIds[i]);
                           }
                           setOpen(true);
                         },

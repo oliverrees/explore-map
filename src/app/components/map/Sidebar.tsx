@@ -217,7 +217,7 @@ export default function Sidebar({
                           <div>
                             <div className="mt-4 flex items-start justify-between">
                               <div>
-                                <h2 className="font-semibold leading-6 text-3xl text-gray-900">
+                                <h2 className="font-semibold leading-6 text-xl text-gray-900">
                                   {activityInfo?.name}
                                 </h2>
                                 <p className="mt-3 text-sm text-gray-500">
