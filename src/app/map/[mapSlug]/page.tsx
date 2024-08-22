@@ -25,10 +25,12 @@ export default async function Page({
     }
     try {
       // Fetch the map activities from the exploremap_maps table
+      const adaptedSlug =
+        mapSlug === "cromer-to-lands-end-1" ? "cromer-to-lands-end" : mapSlug;
       const { data: mapData, error: mapError } = await supabase
         .from("exploremap_maps")
         .select("*")
-        .eq("slug", mapSlug)
+        .eq("slug", adaptedSlug)
         .eq("is_shared", true)
         .single();
 
