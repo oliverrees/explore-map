@@ -10,9 +10,10 @@ import { LoadingSpinner } from "../LoadingSpinner";
 interface sidebarProps {
   activityData: any;
   open: boolean;
-  setOpen: any;
+  onClose: () => void;
   activityId: number;
   mapId: string;
+  isPublic: boolean;
 }
 
 export const revalidate = 600;
@@ -20,19 +21,20 @@ const infoNotes: any = {};
 
 export default function Sidebar({
   open,
-  setOpen,
+  onClose,
   activityData,
   activityId,
   mapId,
+  isPublic,
 }: sidebarProps) {
   const [weather, setWeather] = useState<any>(null);
   const [activityInfo, setActivityInfo] = useState<any>({});
+  const [loading, setLoading] = useState(true);
 
   const closeSidebar = () => {
-    setOpen(false);
+    onClose();
     setTimeout(() => {
-      setActivityInfo({});
-      setWeather(null);
+      setLoading(true);
     }, 1000);
   };
 
@@ -49,13 +51,17 @@ export default function Sidebar({
 
       const data = await response.json();
       if (data) {
+        setLoading(false);
         setActivityInfo(data);
       }
     };
-    if (Object.keys(activityData).length === 0 && open) {
-      getActivityInfo();
+    if (isPublic) {
+      if (open) {
+        getActivityInfo();
+      }
     } else {
       const updatedInfo = { ...activityData, id: activityId };
+      setLoading(false);
       setActivityInfo(updatedInfo);
     }
   }, [activityId, activityData, mapId, open]);
@@ -199,7 +205,7 @@ export default function Sidebar({
                       <button
                         type="button"
                         className="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                        onClick={() => setOpen(false)}
+                        onClick={closeSidebar}
                       >
                         <span className="sr-only">Close panel</span>
                         <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -207,7 +213,7 @@ export default function Sidebar({
                     </div>
                   </Transition.Child>
                   <div className="h-full overflow-y-auto bg-white p-8 pb-24">
-                    {Object.keys(activityInfo).length === 0 ? (
+                    {loading ? (
                       <div className="text-center h-full flex justify-center items-center text-gray-500">
                         <LoadingSpinner />
                       </div>

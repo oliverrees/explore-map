@@ -21,19 +21,6 @@ const Stats = ({
   showSatellite,
   onChangeShowSatellite,
 }: Props) => {
-  const [timeSinceStart, setTimeSinceStart] = useState("..");
-  useEffect(() => {
-    const currentDate = new Date();
-    const year = currentDate.getUTCFullYear();
-    const month = currentDate.getUTCMonth() + 1;
-    const day = currentDate.getUTCDate();
-    const timeSinceStart = differenceInDays(
-      new Date(year, month, day),
-      new Date(2023, 4, 23)
-    );
-    setTimeSinceStart(`Day ${timeSinceStart}`);
-  }, []);
-
   return (
     <div className="fixed bottom-0 md:bottom-10 left-0 right-0 md:right-10 md:left-auto overflow-hidden pointer-events-none shadow-lg md:rounded-lg z-20 md:max-w-md w-full">
       <div
@@ -42,10 +29,13 @@ const Stats = ({
           "text-white md:text-black [text-shadow:_0_1px_1px_rgb(0_0_0_/_80%)] md:[text-shadow:none]"
         }`}
       >
-        <div className="text-xl md:text-2xl font-semibold pl-4 py-4 lg:bg-gray-50">
+        <div className="text-2xl md:text-2xl font-semibold pl-4 pt-4">
           {data.mapName}
         </div>
-        {/* <div className="pl-4 pt-2 font-semibold text-sm">350 Days</div> */}
+        <div className="pl-4 mt-1 lg:mt-2 pb-2 lg:pb-4 font-light text-sm">
+          {format(data.startDate, "dd/MM/yy")} -{" "}
+          {format(data.endDate, "dd/MM/yy")}
+        </div>
         {/* <div className="pl-4 mt-2 mb-2 md:mb-0 text-xs flex gap-x-4 pointer-events-auto">
           <Link
             target="_blank"

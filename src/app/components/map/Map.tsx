@@ -11,13 +11,13 @@ import { WaitingForData } from "./WaitingForData";
 
 type Props = {
   data: any;
-  isPublic?: boolean;
+  isPublic: boolean;
 };
 
-const Map = ({ data, isPublic = true }: Props) => {
+const Map = ({ data, isPublic }: Props) => {
   const [showPins, setShowPins] = useState(true);
   const [open, setOpen] = useState(false);
-  const [activityData, setActivityData] = useState(0);
+  const [activityData, setActivityData] = useState({});
   const [activityId, setActivityId] = useState(0);
   const [showSatellite, setShowSatellite] = useState(false);
   const [animationCoords, setAnimationCoords] = useState<any>([]);
@@ -83,13 +83,17 @@ const Map = ({ data, isPublic = true }: Props) => {
       <div className="w-full h-full relative z-0">
         <Sidebar
           open={open}
-          setOpen={setOpen}
+          onClose={() => setOpen(false)}
           activityData={activityData}
           activityId={activityId}
           mapId={data.mapId}
+          isPublic={isPublic}
         />
         <MapContainer
-          center={coords[0].coords[0]}
+          center={[
+            coords[0].coords[coords[0].coords.length - 1][0],
+            coords[0].coords[coords[0].coords.length - 1][1],
+          ]}
           zoom={10}
           maxZoom={20}
           minZoom={1}
@@ -123,7 +127,7 @@ const Map = ({ data, isPublic = true }: Props) => {
                       })}
                       eventHandlers={{
                         click: (e) => {
-                          if (data.activitiesData) {
+                          if (!isPublic) {
                             setActivityData(
                               data.activitiesData[i]?.activity_data
                             );

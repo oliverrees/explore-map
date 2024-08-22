@@ -2,8 +2,44 @@ import polyline from "@mapbox/polyline";
 import { supabase } from "../../../../lib/supabase/supabaseService";
 import { MapHolder } from "./components/MapHolder";
 import { processMapData } from "@/app/components/map/lib/processMapData";
+import { EmptyScreen } from "@/app/components/map/EmptyScreen";
+import type { Metadata } from "next";
 
 export const revalidate = 5;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { mapSlug: string };
+}) {
+  const mapSlug = params.mapSlug;
+  if (!mapSlug) {
+    return {
+      title: "Map not found",
+    };
+  }
+  const fetchMapTitle = async () => {
+    try {
+      const adaptedSlug =
+        mapSlug === "cromer-to-lands-end-1" ? "cromer-to-lands-end" : mapSlug;
+      const { data: mapData, error: mapError } = await supabase
+        .from("exploremap_maps")
+        .select("map_name")
+        .eq("slug", adaptedSlug)
+        .eq("is_shared", true)
+        .single();
+      if (mapError) throw new Error(mapError.message);
+      console.log(mapData.map_name);
+      return mapData.map_name;
+    } catch (error) {
+      console.error("Error loading map data:", error);
+    }
+  };
+  const title = await fetchMapTitle();
+  return {
+    title,
+  };
+}
 
 export default async function Page({
   params,
@@ -54,7 +90,7 @@ export default async function Page({
   const mapData = await fetchMapData();
 
   if (!mapData) {
-    return <div>Error</div>;
+    return <EmptyScreen text="Map not found" />;
   }
 
   return <MapHolder data={mapData} />;

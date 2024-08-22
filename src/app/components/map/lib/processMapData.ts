@@ -37,6 +37,21 @@ export const processMapData = (
       total + (activity.activity_data.total_elevation_gain || 0),
     0
   );
+
+  const startDate = new Date(
+    Math.min(
+      ...activitiesData.map(
+        (activity: Activity) => new Date(activity.activity_data.start_date)
+      )
+    )
+  );
+  const endDate = new Date(
+    Math.max(
+      ...activitiesData.map(
+        (activity: Activity) => new Date(activity.activity_data.start_date)
+      )
+    )
+  );
   const finalMapData = {
     totalActivities: activityIds.length,
     activityIds,
@@ -46,6 +61,8 @@ export const processMapData = (
     totalDistance,
     totalTime,
     totalElevationGain,
+    startDate,
+    endDate,
   };
   if (withoutActivities) {
     return finalMapData;

@@ -29,7 +29,7 @@ export const MapHolder = ({ data }: MapHolderProps) => {
         height: `${height}px`,
       }}
     >
-      <Map data={data} />
+      <Map data={data} isPublic={true} />
     </div>
   );
 };
