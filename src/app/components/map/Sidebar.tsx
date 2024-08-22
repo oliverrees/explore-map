@@ -33,7 +33,7 @@ export default function Sidebar({
     setTimeout(() => {
       setActivityInfo({});
       setWeather(null);
-    }, 500);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function Sidebar({
       const updatedInfo = { ...activityData, id: activityId };
       setActivityInfo(updatedInfo);
     }
-  }, [activityId]);
+  }, [activityId, activityData, mapId, open]);
 
   const stravaLink = `https://www.strava.com/activities/${activityInfo?.id}`;
 

@@ -38,6 +38,7 @@ export default async function Page({
       const { data: activitiesData, error: activitiesError } = await supabase
         .from("exploremap_activities")
         .select("*")
+        .order("created_at", { ascending: false })
         .in("activity_id", mapData.map_activities);
 
       if (activitiesError) throw new Error(activitiesError.message);
