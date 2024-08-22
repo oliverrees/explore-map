@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { activityId, mapId } = body;
-    if (!activityId) {
+    if (typeof activityId !== "number" || typeof mapId !== "string") {
       return NextResponse.json({ error: "No Id" }, { status: 400 });
     }
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       .single();
 
     if (mapError) {
-      return NextResponse.json({ error: "Error" }, { status: 500 });
+      return NextResponse.json({ error: "Map Error" }, { status: 500 });
     }
 
     const activityIds = map.map_activities;
@@ -48,24 +48,24 @@ export async function POST(request: Request) {
     }
 
     const returnObj = {
-      name: activity.activity_data.name,
-      start_date: activity.activity_data.start_date,
-      moving_time: activity.activity_data.moving_time,
-      elapsed_time: activity.activity_data.elapsed_time,
-      timezone: activity.activity_data.timezone,
-      distance: activity.activity_data.distance,
-      average_cadence: activity.activity_data.average_cadence,
-      average_heartrate: activity.activity_data.average_heartrate,
-      average_watts: activity.activity_data.average_watts,
-      average_speed: activity.activity_data.average_speed,
-      max_heartrate: activity.activity_data.max_heartrate,
-      max_speed: activity.activity_data.max_speed,
-      max_watts: activity.activity_data.max_watts,
-      elev_high: activity.activity_data.elev_high,
-      elev_low: activity.activity_data.elev_low,
-      total_elevation_gain: activity.activity_data.total_elevation_gain,
+      name: activity?.activity_data?.name,
+      start_date: activity?.activity_data?.start_date,
+      moving_time: activity?.activity_data?.moving_time,
+      elapsed_time: activity?.activity_data?.elapsed_time,
+      timezone: activity?.activity_data?.timezone,
+      distance: activity?.activity_data?.distance,
+      average_cadence: activity?.activity_data?.average_cadence,
+      average_heartrate: activity?.activity_data?.average_heartrate,
+      average_watts: activity?.activity_data?.average_watts,
+      average_speed: activity?.activity_data?.average_speed,
+      max_heartrate: activity?.activity_data?.max_heartrate,
+      max_speed: activity?.activity_data?.max_speed,
+      max_watts: activity?.activity_data?.max_watts,
+      elev_high: activity?.activity_data?.elev_high,
+      elev_low: activity?.activity_data?.elev_low,
+      total_elevation_gain: activity?.activity_data?.total_elevation_gain,
       id: activity.activity_id,
-      type: activity.activity_data.type,
+      type: activity?.activity_data?.type,
     };
 
     return NextResponse.json(returnObj);

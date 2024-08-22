@@ -3,6 +3,8 @@ import { supabase } from "../../../../lib/supabase/supabaseService";
 import { MapHolder } from "./components/MapHolder";
 import { processMapData } from "@/app/components/map/lib/processMapData";
 
+export const revalidate = 5;
+
 export default async function Page({
   params,
 }: {

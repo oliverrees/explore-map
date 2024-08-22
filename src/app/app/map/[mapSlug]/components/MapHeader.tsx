@@ -25,29 +25,16 @@ export const MapHeader = ({}: MapHeaderProps) => {
       href: `${baseUrl}/live`,
       description: "Change the live status of this map",
     },
+    {
+      name: "Manage",
+      href: `${baseUrl}/manage`,
+      description: "Manage the map's details and settings",
+    },
   ];
   const pathname = usePathname();
   const currentPage = secondaryNavigation.find(
     (item) => item.href === pathname
   );
-  // const deleteMap = async () => {
-  //   // confirm box
-  //   if (!confirm("Are you sure you want to delete this map?")) {
-  //     return;
-  //   }
-  //   const { data: mapData, error: mapError } = await supabase
-  //     .from("exploremap_maps")
-  //     .delete()
-  //     .eq("map_id", data.mapData.id);
-
-  //   if (mapError) {
-  //     console.error(mapError);
-  //   } else {
-  //     router.push("/app/home");
-  //     fetchMapData();
-  //     console.log(mapData);
-  //   }
-  // };
 
   return (
     <div className="border-b shadow-sm pb-2 bg-white relative z-10">

@@ -14,14 +14,16 @@ interface ChooseNameProps {
   isOpen: boolean;
   onConfirm: (name: string) => void;
   onCancel: () => void;
+  initialName?: string;
 }
 
 export const ChooseName = ({
   isOpen,
   onConfirm,
   onCancel,
+  initialName = "",
 }: ChooseNameProps) => {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(initialName);
   const canSubmit = input !== "" && input.length > 3;
   return (
     <Dialog open={isOpen} onClose={onCancel} className="relative z-10">

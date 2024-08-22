@@ -22,17 +22,12 @@ export const MapStats = ({ data }: MapSettingsProps) => {
       name: "Time",
       value: secondsToHMS(data.totalTime),
     },
-    {
-      name: "Elevation",
-      value: data.totalElevationGain.toFixed(2),
-      unit: "m",
-    },
   ];
 
   return (
     <>
       {/* Stats */}
-      <div className="grid grid-cols-4 bg-white">
+      <div className="grid grid-cols-3 bg-white">
         {stats.map((stat, statIdx) => (
           <div
             key={stat.name}
