@@ -23,6 +23,22 @@ const Map = ({ data, isPublic = true }: Props) => {
   const [animationCoords, setAnimationCoords] = useState<any>([]);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  useEffect(() => {
+    if (isAnimating) {
+      const interval = setInterval(() => {
+        setAnimationCoords((prev: any) => {
+          if (prev.length === combinedCoords.length) {
+            setIsAnimating(false);
+            setAnimationCoords([]);
+            return prev;
+          }
+          return [...prev, combinedCoords[prev.length]];
+        });
+      }, 5);
+      return () => clearInterval(interval);
+    }
+  }, [isAnimating]);
+
   const coords = data.polyLines.map((line: any) => {
     const coords = polyline.decode(line);
     return { coords };
@@ -53,22 +69,6 @@ const Map = ({ data, isPublic = true }: Props) => {
   const onChangeShowSatellite = (satelliteStatus: boolean) => {
     setShowSatellite(satelliteStatus);
   };
-
-  useEffect(() => {
-    if (isAnimating) {
-      const interval = setInterval(() => {
-        setAnimationCoords((prev: any) => {
-          if (prev.length === combinedCoords.length) {
-            setIsAnimating(false);
-            setAnimationCoords([]);
-            return prev;
-          }
-          return [...prev, combinedCoords[prev.length]];
-        });
-      }, 5);
-      return () => clearInterval(interval);
-    }
-  }, [isAnimating]);
 
   return (
     <>
