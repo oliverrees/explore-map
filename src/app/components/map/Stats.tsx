@@ -43,7 +43,7 @@ const Stats = ({
         }`}
       >
         <div className="text-xl md:text-2xl font-semibold pl-4 py-4 lg:bg-gray-50">
-          {data.mapData.map_name}
+          {data.mapName}
         </div>
         {/* <div className="pl-4 pt-2 font-semibold text-sm">350 Days</div> */}
         {/* <div className="pl-4 mt-2 mb-2 md:mb-0 text-xs flex gap-x-4 pointer-events-auto">

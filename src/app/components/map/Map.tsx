@@ -54,7 +54,7 @@ const Map = ({ data }: Props) => {
           setOpen={setOpen}
           activityData={activityData}
           activityId={activityId}
-          mapId={data.mapData.map_id}
+          mapId={data.mapId}
         />
         <MapContainer
           center={coords[0].coords[0]}

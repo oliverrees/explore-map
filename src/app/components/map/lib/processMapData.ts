@@ -39,7 +39,8 @@ export const processMapData = (
   );
   const finalMapData = {
     totalActivities: activityIds.length,
-    mapData,
+    mapId: mapData.map_id,
+    mapName: mapData.map_name,
     polyLines,
     totalDistance,
     totalTime,
@@ -50,6 +51,7 @@ export const processMapData = (
   }
   return {
     ...finalMapData,
+    mapData,
     activitiesData,
     activityIds,
   };
