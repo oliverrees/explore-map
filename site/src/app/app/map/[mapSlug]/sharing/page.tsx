@@ -21,7 +21,6 @@ export default function MapPage() {
     if (mapError) {
       console.error(mapError);
     } else {
-      console.log(mapData);
     }
   };
 

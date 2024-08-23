@@ -30,7 +30,6 @@ export default function MapPage() {
     } else {
       router.push("/app/home");
       fetchMapData();
-      console.log(mapData);
     }
   };
 
@@ -47,7 +46,6 @@ export default function MapPage() {
     } else {
       fetchMapData();
       updateMapData(data.slug);
-      console.log(mapData);
       router.push(`/app/map/${mapData.slug}/manage`);
     }
   };

@@ -87,7 +87,6 @@ const Map = ({ data, isPublic }: Props) => {
           activityData={activityData}
           activityId={activityId}
           mapId={data.mapId}
-          isPublic={isPublic}
         />
         <MapContainer
           center={[
@@ -127,14 +126,7 @@ const Map = ({ data, isPublic }: Props) => {
                       })}
                       eventHandlers={{
                         click: (e) => {
-                          if (!isPublic) {
-                            setActivityData(
-                              data.activitiesData[i]?.activity_data
-                            );
-                            setActivityId(data.activitiesData[i]?.activity_id);
-                          } else {
-                            setActivityId(data.activityIds[i]);
-                          }
+                          setActivityId(data.activityIds[i]);
                           setOpen(true);
                         },
                       }}

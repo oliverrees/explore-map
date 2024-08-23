@@ -13,7 +13,6 @@ interface sidebarProps {
   onClose: () => void;
   activityId: number;
   mapId: string;
-  isPublic: boolean;
 }
 
 export const revalidate = 600;
@@ -25,7 +24,6 @@ export default function Sidebar({
   activityData,
   activityId,
   mapId,
-  isPublic,
 }: sidebarProps) {
   const [weather, setWeather] = useState<any>(null);
   const [activityInfo, setActivityInfo] = useState<any>({});
@@ -55,14 +53,8 @@ export default function Sidebar({
         setActivityInfo(data);
       }
     };
-    if (isPublic) {
-      if (open) {
-        getActivityInfo();
-      }
-    } else {
-      const updatedInfo = { ...activityData, id: activityId };
-      setLoading(false);
-      setActivityInfo(updatedInfo);
+    if (open) {
+      getActivityInfo();
     }
   }, [activityId, activityData, mapId, open]);
 
@@ -236,6 +228,14 @@ export default function Sidebar({
                               </div>
                             </div>
                           </div>
+
+                          {activityInfo?.photos?.["600"] && (
+                            <img
+                              src={activityInfo?.photos?.["600"]}
+                              alt="Activity"
+                              className="w-full h-64 object-cover rounded-lg"
+                            />
+                          )}
 
                           {infoNotes[activityInfo?.activity_id] && (
                             <InfoWindow>

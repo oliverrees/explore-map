@@ -4,11 +4,7 @@ interface Activity {
   strava_id: number;
 }
 
-export const processMapData = (
-  mapData: any,
-  activitiesData: any,
-  withoutActivities?: boolean
-) => {
+export const processMapData = (mapData: any, activitiesData: any) => {
   const polyLines = activitiesData.map((activity: Activity) => {
     return activity.activity_data.map?.summary_polyline || "";
   });
@@ -52,7 +48,7 @@ export const processMapData = (
       )
     )
   );
-  const finalMapData = {
+  return {
     totalActivities: activityIds.length,
     activityIds,
     mapId: mapData.map_id,
@@ -64,14 +60,7 @@ export const processMapData = (
     startDate,
     endDate,
     zoomLevel: mapData.zoom_level,
-  };
-  if (withoutActivities) {
-    return finalMapData;
-  }
-  return {
-    ...finalMapData,
-    mapData,
-    activitiesData,
-    activityIds,
+    slug: mapData.slug,
+    createdAt: mapData.created_at,
   };
 };

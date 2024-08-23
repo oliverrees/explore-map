@@ -75,9 +75,22 @@ export const handleSelectAll = (
   selectedActivities: number[],
   setSelectedActivities: React.Dispatch<React.SetStateAction<number[]>>
 ) => {
-  if (selectedActivities.length === activities.length) {
-    setSelectedActivities([]); // Deselect all if all are selected
+  const allSelectedOnPage = activities.every((activity) =>
+    selectedActivities.includes(activity.activity_id)
+  );
+
+  if (allSelectedOnPage) {
+    // Deselect all activities on the current page
+    const deselected = selectedActivities.filter(
+      (id) => !activities.map((activity) => activity.activity_id).includes(id)
+    );
+    setSelectedActivities(deselected);
   } else {
-    setSelectedActivities(activities.map((activity) => activity.activity_id)); // Select all
+    // Select all activities on the current page
+    const selected = [
+      ...selectedActivities,
+      ...activities.map((activity) => activity.activity_id),
+    ];
+    setSelectedActivities([...new Set(selected)]); // Ensure no duplicates
   }
 };

@@ -83,7 +83,7 @@ export async function POST(request: Request) {
       (aspect_type === "create" || aspect_type === "update")
     ) {
       const activityResponse = await fetch(
-        `https://www.strava.com/api/v3/athlete/activities?page=1&per_page=1`,
+        `https://www.strava.com/api/v3/athlete/activities?page=1&per_page=10`,
         {
           headers: {
             Authorization: `Bearer ${stravaTokenData.access_token}`,

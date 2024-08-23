@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../../../lib/supabase/supabaseService";
+import { fetchAndStorePhotos } from "../lib/fetchAndStorePhotos";
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Map Error" }, { status: 500 });
     }
 
-    // Check activty id is in map
+    // Check activity ID is in map
     if (!map?.map_activities.includes(activityId)) {
       return NextResponse.json(
         { error: "Activity not in map" },
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     // Fetch activity from Supabase
-    const { data: activity, error } = await supabase
+    let { data: activity, error } = await supabase
       .from("exploremap_activities")
       .select("*")
       .eq("activity_id", activityId)
@@ -52,6 +53,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Error" }, { status: 404 });
     }
 
+    // Check if photos need to be fetched and stored
+    if (activity?.activity_data?.total_photo_count > 0 && !activity?.photos) {
+      // Get photos and store them
+      const photos = await fetchAndStorePhotos(activityId);
+
+      // Update the activity object with the fetched photos
+      activity.photos = photos;
+    }
+
+    // Build the return object, including photos if available
     const returnObj = {
       name: activity?.activity_data?.name,
       start_date: activity?.activity_data?.start_date,
@@ -71,6 +82,7 @@ export async function POST(request: Request) {
       total_elevation_gain: activity?.activity_data?.total_elevation_gain,
       id: activity.activity_id,
       type: activity?.activity_data?.type,
+      photos: activity?.photos?.primary?.urls || null,
     };
 
     return NextResponse.json(returnObj);

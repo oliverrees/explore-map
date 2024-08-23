@@ -5,7 +5,7 @@ import PolylineSvg from "../PolylineSvg";
 interface TableRowProps {
   activity: any;
   selected: boolean;
-  onSelect: (activity: any) => void;
+  onSelect: (e: any) => void;
 }
 
 export default function TableRow({
@@ -13,14 +13,10 @@ export default function TableRow({
   selected,
   onSelect,
 }: TableRowProps) {
-  const handleRowClick = () => {
-    onSelect(activity);
-  };
-
   return (
     <tr
-      onClick={handleRowClick}
-      className={`cursor-pointer hover:bg-blue-50 ${
+      onClick={onSelect}
+      className={`cursor-pointer select-none hover:bg-blue-50 ${
         selected ? "bg-gray-50" : ""
       }`}
     >
@@ -32,10 +28,10 @@ export default function TableRow({
           type="checkbox"
           className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
           checked={selected}
-          onChange={() => onSelect(activity)}
+          onChange={onSelect}
         />
       </td>
-      <td className="whitespace-nowrap py-4 pr-3 text-sm font-medium text-gray-900">
+      <td className="w-12 py-4 pr-3 text-sm font-medium text-gray-900">
         {activity.activity_data.map?.summary_polyline && (
           <PolylineSvg
             encodedPolyline={activity.activity_data.map?.summary_polyline || ""}
@@ -44,22 +40,22 @@ export default function TableRow({
           />
         )}
       </td>
-      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-        {activity.activity_data.name}
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-64">
+        <div className="w-64 truncate">{activity.activity_data.name}</div>
       </td>
-      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-48">
         {format(
           new Date(activity.activity_data.start_date),
           "dd/MM/yyyy HH:mm:ss"
         )}
       </td>
-      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-48">
         {activity.activity_data.type}
       </td>
-      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-48">
         {(activity.activity_data.distance / 1000).toFixed(2)} km
       </td>
-      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-48">
         {activity.activity_data.average_speed.toFixed(2)} m/s
       </td>
     </tr>

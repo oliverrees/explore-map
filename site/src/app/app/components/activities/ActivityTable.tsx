@@ -47,10 +47,12 @@ export const ActivityTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const activitiesPerPage = 250;
 
-  // State to handle selected activities
   const [selectedActivities, setSelectedActivities] = useState<number[]>(
     initialSelectedActivities || []
   );
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null
+  ); // For shift-click selection
 
   const checkTaskStatus = async () => {
     try {
@@ -58,7 +60,6 @@ export const ActivityTable = ({
         `/api/check-function-status?stravaId=${userData.strava_id}`
       );
       const result = await response.json();
-      // Check how long ago the task was updated
       const updatedDate = new Date(result.lastUpdated);
       const currentDate = new Date();
       const diff = currentDate.getTime() - updatedDate.getTime();
@@ -90,7 +91,14 @@ export const ActivityTable = ({
     try {
       const { data, error } = await supabase
         .from("exploremap_activities")
-        .select("*")
+        .select(
+          `
+          id,
+          strava_id,
+          activity_id,
+          activity_data
+        `
+        )
         .eq("strava_id", userData.strava_id);
 
       if (error) {
@@ -103,7 +111,6 @@ export const ActivityTable = ({
           checkTaskStatus();
         } else {
           setActivities(data);
-          setLoading(false);
         }
       }
     } catch (err: any) {
@@ -131,7 +138,6 @@ export const ActivityTable = ({
   }, []);
 
   useEffect(() => {
-    // Poll the task status every 5 seconds if loading
     if (loading) {
       const interval = setInterval(() => {
         checkTaskStatus();
@@ -158,6 +164,22 @@ export const ActivityTable = ({
     await syncActivitiesWithStrava(true);
   };
 
+  const handleShiftSelect = (index: number) => {
+    if (lastSelectedIndex !== null) {
+      const start = Math.min(lastSelectedIndex, index);
+      const end = Math.max(lastSelectedIndex, index);
+      const activitiesToSelect = paginatedActivities.slice(start, end + 1);
+      const activityIds = activitiesToSelect.map(
+        (activity) => activity.activity_id
+      );
+
+      setSelectedActivities((prevSelected) => [
+        ...new Set([...prevSelected, ...activityIds]),
+      ]);
+    }
+    setLastSelectedIndex(index);
+  };
+
   return (
     <>
       {loading ? (
@@ -178,28 +200,35 @@ export const ActivityTable = ({
               <TableHeader
                 sortConfig={sortConfig}
                 handleSort={(key) => handleSort(key, sortConfig, setSortConfig)}
-                isAllSelected={selectedActivities.length === activities.length} // Pass the state to the header
+                isAllSelected={paginatedActivities.every((activity) =>
+                  selectedActivities.includes(activity.activity_id)
+                )}
                 handleSelectAll={() =>
                   handleSelectAll(
-                    activities,
+                    paginatedActivities,
                     selectedActivities,
                     setSelectedActivities
                   )
-                } // Pass the select all handler to the header
+                }
               />
-              <tbody className="divide-y divide-gray-200 bg-white ">
-                {paginatedActivities.map((activity) => (
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {paginatedActivities.map((activity, index) => (
                   <TableRow
                     key={activity.activity_id}
                     activity={activity}
                     selected={selectedActivities.includes(activity.activity_id)}
-                    onSelect={() =>
-                      handleSelectActivity(
-                        activity,
-                        selectedActivities,
-                        setSelectedActivities
-                      )
-                    }
+                    onSelect={(e) => {
+                      if (e.shiftKey) {
+                        handleShiftSelect(index);
+                      } else {
+                        handleSelectActivity(
+                          activity,
+                          selectedActivities,
+                          setSelectedActivities
+                        );
+                        setLastSelectedIndex(index);
+                      }
+                    }}
                   />
                 ))}
               </tbody>

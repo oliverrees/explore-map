@@ -7,7 +7,7 @@ interface MapHeaderProps {}
 
 export const MapHeader = ({}: MapHeaderProps) => {
   const { data } = useMapData();
-  const baseUrl = `/app/map/${data.mapData.slug}`;
+  const baseUrl = `/app/map/${data.slug}`;
   const secondaryNavigation = [
     { name: "Overview", href: baseUrl },
     {
@@ -64,14 +64,14 @@ export const MapHeader = ({}: MapHeaderProps) => {
             <h1 className="flex gap-x-3 text-lg lg:text-2xl leading-7">
               <span className="font-semibold ">
                 {currentPage?.name === "Overview"
-                  ? data.mapData.map_name
+                  ? data.mapName
                   : currentPage?.name}
               </span>
             </h1>
           </div>
           <p className="lg:mt-1 text-sm lg:text-base leading-6 text-gray-400 font-light">
             {currentPage?.name === "Overview" ? (
-              <>Created on {format(data.mapData.created_at, "MMMM dd, yyyy")}</>
+              <>Created on {format(data.createdAt, "MMMM dd, yyyy")}</>
             ) : (
               currentPage?.description
             )}

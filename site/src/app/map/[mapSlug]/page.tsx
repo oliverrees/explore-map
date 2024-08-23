@@ -29,7 +29,6 @@ export async function generateMetadata({
         .eq("is_shared", true)
         .single();
       if (mapError) throw new Error(mapError.message);
-      console.log(mapData.map_name);
       return mapData.map_name;
     } catch (error) {
       console.error("Error loading map data:", error);
@@ -81,7 +80,7 @@ export default async function Page({
 
       if (activitiesError) throw new Error(activitiesError.message);
 
-      return processMapData(mapData, activitiesData, true);
+      return processMapData(mapData, activitiesData);
     } catch (error) {
       console.error("Error loading map data:", error);
     }

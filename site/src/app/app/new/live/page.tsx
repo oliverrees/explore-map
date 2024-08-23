@@ -60,7 +60,6 @@ export default function LivePage() {
       router.push(`/app/map/${mapSlug}`); // Redirect to the slug-based URL
     }
   };
-  console.log(parsedDate);
 
   return (
     <>

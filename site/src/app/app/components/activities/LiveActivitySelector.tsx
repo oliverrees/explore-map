@@ -32,7 +32,6 @@ export function LiveActivitySelector({
   });
 
   const handleDateChange = () => {
-    console.log(value);
     const startDate = value.start.toDate(getLocalTimeZone());
     const endDate = value.end.toDate(getLocalTimeZone());
 

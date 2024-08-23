@@ -8,8 +8,8 @@ interface TableHeaderProps {
 export default function TableHeader({
   sortConfig,
   handleSort,
-  isAllSelected, // New prop
-  handleSelectAll, // New prop
+  isAllSelected,
+  handleSelectAll,
 }: TableHeaderProps) {
   const getSortIndicator = (key: string) => {
     if (sortConfig?.key === key) {
@@ -19,53 +19,53 @@ export default function TableHeader({
   };
 
   return (
-    <thead className="sticky top-0 bg-blue-50 z-10 ">
+    <thead className="sticky top-0 bg-blue-50 z-10">
       <tr>
         <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
           <input
             type="checkbox"
             className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
-            checked={isAllSelected} // Bind the checkbox state to isAllSelected
-            onChange={handleSelectAll} // Call handleSelectAll when clicked
+            checked={isAllSelected}
+            onChange={handleSelectAll}
           />
         </th>
         <th
           scope="col"
-          className="py-3.5 pr-3 text-left text-sm font-semibold text-gray-900 cursor-pointer w-48"
+          className="py-3.5 pr-3 text-left text-sm font-semibold text-gray-900 cursor-pointer w-12"
         >
           Route
         </th>
         <th
           scope="col"
-          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-2/12"
+          className="px-3 py-3.5 text-left truncate text-sm font-semibold text-gray-900 cursor-pointer w-48"
           onClick={() => handleSort("name")}
         >
           Title {getSortIndicator("name")}
         </th>
         <th
           scope="col"
-          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-2/12"
+          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-48"
           onClick={() => handleSort("start_date")}
         >
           Date {getSortIndicator("start_date")}
         </th>
         <th
           scope="col"
-          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-2/12"
+          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-48"
           onClick={() => handleSort("type")}
         >
           Type {getSortIndicator("type")}
         </th>
         <th
           scope="col"
-          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-2/12"
+          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-48"
           onClick={() => handleSort("distance")}
         >
           Distance {getSortIndicator("distance")}
         </th>
         <th
           scope="col"
-          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-2/12"
+          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-48"
           onClick={() => handleSort("average_speed")}
         >
           Average Speed {getSortIndicator("average_speed")}
