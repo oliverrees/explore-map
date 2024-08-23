@@ -94,7 +94,7 @@ const Map = ({ data, isPublic }: Props) => {
             coords[0].coords[coords[0].coords.length - 1][0],
             coords[0].coords[coords[0].coords.length - 1][1],
           ]}
-          zoom={10}
+          zoom={data.zoomLevel}
           maxZoom={20}
           minZoom={1}
           className="w-full h-full"

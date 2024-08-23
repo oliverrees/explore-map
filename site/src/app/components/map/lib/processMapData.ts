@@ -63,6 +63,7 @@ export const processMapData = (
     totalElevationGain,
     startDate,
     endDate,
+    zoomLevel: mapData.zoom_level,
   };
   if (withoutActivities) {
     return finalMapData;
