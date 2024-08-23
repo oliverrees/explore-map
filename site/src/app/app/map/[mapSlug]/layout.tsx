@@ -41,7 +41,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       if (activitiesError) throw new Error(activitiesError.message);
 
-      const processedData = processMapData(mapData, activitiesData);
+      const processedData = processMapData(mapData, activitiesData, true);
       setData(processedData);
     } catch (error) {
       console.error("Error loading map data:", error);

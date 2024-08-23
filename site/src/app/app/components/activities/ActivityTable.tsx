@@ -76,6 +76,7 @@ export const ActivityTable = ({
         setLoadingMessage("Loading activities from Strava...");
       } else if (result.status === "completed") {
         setError(null);
+        setLoading(false);
         fetchActivitiesFromSupabase();
       } else if (result.status === "failed") {
         setLoading(false);
@@ -182,7 +183,7 @@ export const ActivityTable = ({
 
   return (
     <>
-      {loading ? (
+      {loading || paginatedActivities.length === 0 ? (
         <div className="flex justify-center items-center h-full w-full py-12 flex-col">
           <LoadingSpinner />
           <p className="mt-4 text-gray-500">{loadingMessage}</p>
@@ -196,7 +197,7 @@ export const ActivityTable = ({
           )}
 
           <CardHolder classNames={`relative overflow-auto`}>
-            <table className="min-w-full table-fixed font-light">
+            <table className="min-w-full table-fixed font-light h-full">
               <TableHeader
                 sortConfig={sortConfig}
                 handleSort={(key) => handleSort(key, sortConfig, setSortConfig)}

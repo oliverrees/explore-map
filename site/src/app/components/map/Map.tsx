@@ -22,6 +22,7 @@ const Map = ({ data, isPublic }: Props) => {
   const [showSatellite, setShowSatellite] = useState(false);
   const [animationCoords, setAnimationCoords] = useState<any>([]);
   const [isAnimating, setIsAnimating] = useState(false);
+  const centerCoords: any = [];
 
   useEffect(() => {
     if (isAnimating) {
@@ -39,8 +40,14 @@ const Map = ({ data, isPublic }: Props) => {
     }
   }, [isAnimating]);
 
-  const coords = data.polyLines.map((line: any) => {
+  const coords = data.polyLines.map((line: any, indx: number) => {
+    const activityId = data.activityIds[indx];
+
     const coords = polyline.decode(line);
+    if (activityId === data.mostRecentActivityId) {
+      centerCoords.push(coords[coords.length - 1]);
+    }
+
     return { coords };
   });
 
@@ -89,10 +96,7 @@ const Map = ({ data, isPublic }: Props) => {
           mapId={data.mapId}
         />
         <MapContainer
-          center={[
-            coords[0].coords[coords[0].coords.length - 1][0],
-            coords[0].coords[coords[0].coords.length - 1][1],
-          ]}
+          center={[centerCoords[0][0], centerCoords[0][1]]}
           zoom={data.zoomLevel}
           maxZoom={20}
           minZoom={1}

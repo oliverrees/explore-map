@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import PolylineSvg from "../PolylineSvg";
+import Link from "next/link";
 
 interface TableRowProps {
   activity: any;
@@ -56,7 +57,13 @@ export default function TableRow({
         {(activity.activity_data.distance / 1000).toFixed(2)} km
       </td>
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 w-48">
-        {activity.activity_data.average_speed.toFixed(2)} m/s
+        <Link
+          href={`https://www.strava.com/activities/${activity.activity_id}`}
+          className="text-blue-600 hover:underline"
+          target="_blank"
+        >
+          Link
+        </Link>
       </td>
     </tr>
   );

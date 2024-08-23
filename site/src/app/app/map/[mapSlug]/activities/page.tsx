@@ -14,9 +14,6 @@ export default function MapPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { supabase } = useUserContext();
-  const [selectedActivities, setSelectedActivities] = useState<number[]>(
-    data.mapData.map_activities
-  );
   if (!data) return null;
 
   const saveActivities = async (activities: number[]) => {
@@ -29,8 +26,8 @@ export default function MapPage() {
     if (mapError) {
       console.error(mapError);
     } else {
-      updateMapData(data.mapData.slug);
-      router.push(`/app/map/${data.mapData.slug}`);
+      updateMapData(data.slug);
+      router.push(`/app/map/${data.slug}`);
     }
     setLoading(false);
   };
@@ -50,12 +47,11 @@ export default function MapPage() {
     >
       <div className="h-full flex flex-col">
         <ActivityTable
-          ctaText="Update Activities"
+          ctaText="Update"
           onConfirm={(selectedActivitiesNew: number[]) => {
-            setSelectedActivities(selectedActivities);
             saveActivities(selectedActivitiesNew);
           }}
-          initialSelectedActivities={selectedActivities}
+          initialSelectedActivities={data.activityIds}
         />
       </div>
     </div>

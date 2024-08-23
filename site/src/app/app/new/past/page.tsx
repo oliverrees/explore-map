@@ -62,7 +62,7 @@ export default function ActivitiesTable() {
       <UserMaxWidth>
         {loading ? (
           <>
-            <div className="flex justify-center items-center h-full w-full py-12 flex-col">
+            <div className="flex justify-center items-center h-screen w-full py-12 flex-col">
               <LoadingSpinner />
               <p className="mt-4 text-gray-500">Creating Map</p>
             </div>

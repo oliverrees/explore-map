@@ -66,9 +66,8 @@ export default function TableHeader({
         <th
           scope="col"
           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 cursor-pointer w-48"
-          onClick={() => handleSort("average_speed")}
         >
-          Average Speed {getSortIndicator("average_speed")}
+          Strava Link
         </th>
       </tr>
     </thead>

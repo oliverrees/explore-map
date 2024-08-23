@@ -1,26 +1,68 @@
 "use client";
+import { useEffect, useState } from "react";
 import { classNames } from "../../../../../../lib/functions/classNames";
-import { secondsToHMS } from "../../../../../../lib/functions/secondsToHMS";
 import { useUserContext } from "@/app/app/components/UserContext";
 import { useRouter } from "next/navigation";
+import { secondsToDaysHours } from "../../../../../../lib/functions/secondsToDaysHours";
+import { formatNumber } from "../../../../../../lib/functions/formatNumber";
+import { secondsToHMS } from "../../../../../../lib/functions/secondsToHMS";
+import { secondsToHours } from "date-fns";
 
 interface MapSettingsProps {
   data: any;
 }
 
 export const MapStats = ({ data }: MapSettingsProps) => {
-  const { supabase, fetchMapData } = useUserContext();
-  const router = useRouter();
+  const { token } = useUserContext();
+
+  const [pageViews, setPageViews] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchPageViews = async () => {
+      try {
+        const response = await fetch(`/api/get-stats?mapId=${data.mapId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Failed to fetch page views");
+          return;
+        }
+
+        const result = await response.json();
+        setPageViews(result?.results?.visitors?.value ?? 0);
+      } catch (error) {
+        console.error("Error fetching page views:", error);
+      }
+    };
+
+    console.log(data.totalTime);
+
+    fetchPageViews();
+  }, [data.mapId]);
+
   const stats = [
-    { name: "Activities", value: data.activityIds.length },
     {
-      name: "Distance",
-      value: (data.totalDistance / 1000).toFixed(2),
-      unit: "km",
+      name: "Map Views",
+      value: data.mapData.is_shared
+        ? pageViews !== null
+          ? formatNumber(pageViews)
+          : ".."
+        : "N/A",
+      unit: "",
     },
     {
-      name: "Time",
-      value: secondsToHMS(data.totalTime),
+      name: "Total Activties",
+      value: data.mapData.map_activities.length,
+      unit: "",
+    },
+    {
+      name: "Activity Sync",
+      value: data.mapData.map_live_start_date ? "Enabled" : "N/A",
+      unit: "",
     },
   ];
 

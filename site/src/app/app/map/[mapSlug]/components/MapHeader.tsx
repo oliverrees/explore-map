@@ -16,14 +16,19 @@ export const MapHeader = ({}: MapHeaderProps) => {
       description: "Configure sharing settings for this map",
     },
     {
+      name: "Customise",
+      href: `${baseUrl}/customise`,
+      description: "Customise the appearance of your map",
+    },
+    {
       name: "Activities",
       href: `${baseUrl}/activities`,
       description: "Choose which activities are on this map",
     },
     {
-      name: "Live",
+      name: "Activity Sync",
       href: `${baseUrl}/live`,
-      description: "Change the live status of this map",
+      description: "Choose the date range for auto activity syncing",
     },
     {
       name: "Manage",
@@ -37,7 +42,7 @@ export const MapHeader = ({}: MapHeaderProps) => {
   );
 
   return (
-    <div className="border-b shadow-sm pb-2 bg-white relative z-10">
+    <div className="border-b pb-2 bg-white relative z-10">
       <nav className="flex overflow-x-auto pb-4 lg:py-4 mt-16 lg:mt-0 ">
         <ul
           role="list"

@@ -12,6 +12,7 @@ interface UserContextProps {
   mapData: any;
   supabase: any;
   fetchMapData: () => void;
+  token: string;
 }
 
 interface UserProviderProps {
@@ -73,7 +74,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({
 
   return (
     <UserContext.Provider
-      value={{ loading, userData, mapData, fetchMapData, supabase }}
+      value={{ loading, userData, mapData, fetchMapData, supabase, token }}
     >
       <div className="w-full">
         <UserContainer>{children}</UserContainer>

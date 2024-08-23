@@ -4,7 +4,11 @@ interface Activity {
   strava_id: number;
 }
 
-export const processMapData = (mapData: any, activitiesData: any) => {
+export const processMapData = (
+  mapData: any,
+  activitiesData: any,
+  isOwner?: boolean
+) => {
   const polyLines = activitiesData.map((activity: Activity) => {
     return activity.activity_data.map?.summary_polyline || "";
   });
@@ -48,7 +52,21 @@ export const processMapData = (mapData: any, activitiesData: any) => {
       )
     )
   );
-  return {
+
+  // Most recent activity Id
+  const mostRecentActivityId = activitiesData.reduce(
+    (mostRecent: any, activity: Activity) => {
+      if (new Date(activity.activity_data.start_date) > mostRecent.date) {
+        return {
+          date: new Date(activity.activity_data.start_date),
+          id: activity.activity_id,
+        };
+      }
+      return mostRecent;
+    },
+    { date: new Date(0), id: 0 }
+  );
+  const standardObject = {
     totalActivities: activityIds.length,
     activityIds,
     mapId: mapData.map_id,
@@ -62,5 +80,14 @@ export const processMapData = (mapData: any, activitiesData: any) => {
     zoomLevel: mapData.zoom_level,
     slug: mapData.slug,
     createdAt: mapData.created_at,
+    mostRecentActivityId: mostRecentActivityId.id,
   };
+
+  if (isOwner) {
+    return {
+      ...standardObject,
+      mapData,
+    };
+  }
+  return standardObject;
 };

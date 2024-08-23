@@ -77,7 +77,7 @@ export function LiveActivitySelector({
             onClick={() => onUpdate({ start: null, end: null })}
             className="block rounded-md bg-red-500 text-white border px-3 py-1.5 text-center text-sm font-semibold leading-6 shadow-sm w-full"
           >
-            Remove Live Range
+            Stop Auto Sync
           </button>
         )}
       </div>

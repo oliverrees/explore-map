@@ -1,8 +1,9 @@
 "use client";
 import { Switch } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import { format, addDays } from "date-fns";
+import { format, addDays, secondsToHours } from "date-fns";
 import { secondsToHMS } from "../../../../lib/functions/secondsToHMS";
+import { formatNumber } from "../../../../lib/functions/formatNumber";
 interface Props {
   data: any;
   onChangeShowPins: (pinStatus: boolean) => void;
@@ -31,16 +32,16 @@ const StatsTable = ({
     {
       label: "Total distance",
       value: {
-        km: (data.totalDistance / 1000).toFixed(1),
-        miles: ((data.totalDistance / 1000) * 0.621371).toFixed(1),
+        km: formatNumber(data.totalDistance / 1000),
+        miles: formatNumber((data.totalDistance / 1000) * 0.621371),
       },
       alwaysShow: false,
     },
     {
       label: "Total elevation",
       value: {
-        km: data.totalElevationGain.toFixed(1),
-        miles: (data.totalElevationGain * 3.28084).toFixed(1),
+        km: formatNumber(data.totalElevationGain),
+        miles: formatNumber(data.totalElevationGain * 3.28084),
       },
       alwaysShow: false,
     },
@@ -81,7 +82,7 @@ const StatsTable = ({
                   Total Time (hrs)
                 </td>
                 <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
-                  {secondsToHMS(data.totalTime)}
+                  {secondsToHours(data.totalTime)}
                 </td>
               </tr>
               <tr className="flex justify-between">

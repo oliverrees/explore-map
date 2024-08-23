@@ -15,6 +15,7 @@ interface ChooseNameProps {
   onConfirm: (name: string) => void;
   onCancel: () => void;
   initialName?: string;
+  cta?: string;
 }
 
 export const ChooseName = ({
@@ -22,6 +23,7 @@ export const ChooseName = ({
   onConfirm,
   onCancel,
   initialName = "",
+  cta = "Create Map",
 }: ChooseNameProps) => {
   const [input, setInput] = useState(initialName);
   const canSubmit = input !== "" && input.length > 3;
@@ -90,7 +92,7 @@ export const ChooseName = ({
                 type="button"
                 className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
               >
-                Create Map
+                {cta}
               </button>
               <button
                 type="button"

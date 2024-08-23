@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { LiveActivitySelector } from "@/app/app/components/activities/LiveActivitySelector";
 import { LoadingSpinner } from "@/app/components/LoadingSpinner";
+import { CardHolder } from "@/app/app/components/CardHolder";
 
 export default function MapPage() {
   const { data, updateMapData } = useMapData();
@@ -44,9 +45,14 @@ export default function MapPage() {
   return (
     <div
       className="px-4 sm:px-6 lg:px-8 py-4 max-w-7xl w-full mx-auto
-    h-full overflow-hidden"
+    h-full"
     >
       <div className="h-full flex flex-col">
+        <CardHolder classNames="font-normal p-4 mb-4">
+          If you activity syncing is enabled, activities from Strava will be
+          automatically added to your map. You can choose the date range for
+          which activities will be synced below.
+        </CardHolder>
         <LiveActivitySelector
           initialDates={{
             start: data?.mapData.map_live_start_date,
@@ -55,7 +61,7 @@ export default function MapPage() {
           onUpdate={(range: { start: Date | null; end: Date | null }) => {
             saveLive(range);
           }}
-          ctaText="Update Live Range"
+          ctaText="Update"
           showCancel={
             data.mapData.map_live_start_date && data.mapData.map_live_end_date
           }
