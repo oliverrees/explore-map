@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function GET(request: Request) {
+export function GET(request: Request) {
   try {
     // Clear the token cookie by setting it to expire immediately
     cookies().set("token", "", { expires: new Date(0) });
