@@ -36,11 +36,13 @@ export default function TableRow({
         />
       </td>
       <td className="whitespace-nowrap py-4 pr-3 text-sm font-medium text-gray-900">
-        <PolylineSvg
-          encodedPolyline={activity.activity_data.map?.summary_polyline || ""}
-          width={25}
-          height={25}
-        />
+        {activity.activity_data.map?.summary_polyline && (
+          <PolylineSvg
+            encodedPolyline={activity.activity_data.map?.summary_polyline || ""}
+            width={25}
+            height={25}
+          />
+        )}
       </td>
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
         {activity.activity_data.name}

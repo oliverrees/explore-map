@@ -6,6 +6,12 @@ import TableRow from "./TableRow";
 import { CardHolder } from "../CardHolder";
 import { useState, useEffect } from "react";
 import { useUserContext } from "../UserContext";
+import {
+  sortActivities,
+  handleSort,
+  handleSelectActivity,
+  handleSelectAll,
+} from "./activityTableUtilities";
 
 interface ActivityTableProps {
   onConfirm: (selectedActivities: number[]) => void;
@@ -28,9 +34,8 @@ export const ActivityTable = ({
   const { userData, supabase } = useUserContext();
   const [loading, setLoading] = useState<boolean>(true);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [loadingMessage, setLoadingMessage] = useState<string>(
-    "Fetching activities from Strava..."
-  );
+  const [loadingMessage, setLoadingMessage] =
+    useState<string>("Loading activities");
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -47,6 +52,40 @@ export const ActivityTable = ({
     initialSelectedActivities || []
   );
 
+  const checkTaskStatus = async () => {
+    try {
+      const response = await fetch(
+        `/api/check-function-status?stravaId=${userData.strava_id}`
+      );
+      const result = await response.json();
+      // Check how long ago the task was updated
+      const updatedDate = new Date(result.lastUpdated);
+      const currentDate = new Date();
+      const diff = currentDate.getTime() - updatedDate.getTime();
+      const diffInMinutes = diff / 1000 / 60;
+
+      if (diffInMinutes > 5) {
+        fetchActivitiesFromSupabase();
+        setLoading(false);
+      }
+
+      if (result.status === "in_progress") {
+        setError(null);
+        setLoading(true);
+        setLoadingMessage("Loading activities from Strava...");
+      } else if (result.status === "completed") {
+        setError(null);
+        fetchActivitiesFromSupabase();
+      } else if (result.status === "failed") {
+        setLoading(false);
+        setError("Failed to sync activities.");
+      }
+    } catch (err: any) {
+      setLoading(false);
+      setError("Failed to check task status.");
+    }
+  };
+
   const fetchActivitiesFromSupabase = async () => {
     try {
       const { data, error } = await supabase
@@ -61,6 +100,7 @@ export const ActivityTable = ({
       if (data) {
         if (data.length === 0) {
           syncActivitiesWithStrava();
+          checkTaskStatus();
         } else {
           setActivities(data);
           setLoading(false);
@@ -73,62 +113,35 @@ export const ActivityTable = ({
   };
 
   const syncActivitiesWithStrava = async (forceReload?: boolean) => {
-    setLoadingMessage("Syncing activities with Strava...");
-    const { data, error } = await supabase.functions.invoke('fetch-strava-activities', {
-      body: { stravaId: userData.strava_id }
-      
-    })
+    setLoadingMessage("Loading activities from Strava...");
+    const { data, error } = await supabase.functions.invoke(
+      "fetch-strava-activities",
+      {
+        body: { stravaId: userData.strava_id },
+      }
+    );
 
-    console.log(data)
-    
     if (error) {
       setError(error.message);
-    } else {
-      fetchActivitiesFromSupabase();
     }
   };
 
   useEffect(() => {
-    fetchActivitiesFromSupabase();
+    checkTaskStatus();
   }, []);
 
-  const handleSort = (key: string) => {
-    let direction = "ascending";
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === "ascending"
-    ) {
-      direction = "descending";
+  useEffect(() => {
+    // Poll the task status every 5 seconds if loading
+    if (loading) {
+      const interval = setInterval(() => {
+        checkTaskStatus();
+      }, 5000);
+
+      return () => clearInterval(interval);
     }
-    setSortConfig({ key, direction });
-  };
+  }, [loading]);
 
-  const sortedActivities = () => {
-    let sortableItems = [...activities];
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        let aValue = a.activity_data[sortConfig.key];
-        let bValue = b.activity_data[sortConfig.key];
-
-        if (sortConfig.key === "distance") {
-          aValue = aValue / 1000;
-          bValue = bValue / 1000;
-        }
-
-        if (aValue < bValue) {
-          return sortConfig.direction === "ascending" ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === "ascending" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableItems;
-  };
-
-  const paginatedActivities = sortedActivities().slice(
+  const paginatedActivities = sortActivities(activities, sortConfig).slice(
     (currentPage - 1) * activitiesPerPage,
     currentPage * activitiesPerPage
   );
@@ -137,37 +150,21 @@ export const ActivityTable = ({
     setCurrentPage(page);
   };
 
-  const handleSelectActivity = (activity: Activity) => {
-    const isSelected = selectedActivities.includes(activity.activity_id);
-    if (isSelected) {
-      setSelectedActivities(
-        selectedActivities.filter((id) => id !== activity.activity_id)
-      );
-    } else {
-      setSelectedActivities([...selectedActivities, activity.activity_id]);
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectedActivities.length === activities.length) {
-      setSelectedActivities([]); // Deselect all if all are selected
-    } else {
-      setSelectedActivities(activities.map((activity) => activity.activity_id)); // Select all
-    }
-  };
-
   const handleSyncButtonClick = async () => {
+    setLoading(true);
+    setTimeout(() => {
+      checkTaskStatus();
+    }, 500);
     await syncActivitiesWithStrava(true);
   };
+
   return (
     <>
       {loading ? (
-        <>
-          <div className="flex justify-center items-center h-full w-full py-12 flex-col">
-            <LoadingSpinner />
-            <p className="mt-4 text-gray-500">{loadingMessage}</p>
-          </div>
-        </>
+        <div className="flex justify-center items-center h-full w-full py-12 flex-col">
+          <LoadingSpinner />
+          <p className="mt-4 text-gray-500">{loadingMessage}</p>
+        </div>
       ) : (
         <>
           {error && (
@@ -180,9 +177,15 @@ export const ActivityTable = ({
             <table className="min-w-full table-fixed font-light">
               <TableHeader
                 sortConfig={sortConfig}
-                handleSort={handleSort}
+                handleSort={(key) => handleSort(key, sortConfig, setSortConfig)}
                 isAllSelected={selectedActivities.length === activities.length} // Pass the state to the header
-                handleSelectAll={handleSelectAll} // Pass the select all handler to the header
+                handleSelectAll={() =>
+                  handleSelectAll(
+                    activities,
+                    selectedActivities,
+                    setSelectedActivities
+                  )
+                } // Pass the select all handler to the header
               />
               <tbody className="divide-y divide-gray-200 bg-white ">
                 {paginatedActivities.map((activity) => (
@@ -190,7 +193,13 @@ export const ActivityTable = ({
                     key={activity.activity_id}
                     activity={activity}
                     selected={selectedActivities.includes(activity.activity_id)}
-                    onSelect={handleSelectActivity}
+                    onSelect={() =>
+                      handleSelectActivity(
+                        activity,
+                        selectedActivities,
+                        setSelectedActivities
+                      )
+                    }
                   />
                 ))}
               </tbody>

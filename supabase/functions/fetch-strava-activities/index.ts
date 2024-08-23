@@ -9,30 +9,77 @@ serve(async (req) => {
 
   let taskId;
 
+  // Define corsHeaders at the top level so it's accessible throughout the function
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
+    "Access-Control-Max-Age": "86400",
+  };
+
   try {
+    // Set the allowed origin based on the request origin
+    const allowedOrigins = [
+      "https://exploremap.io",
+      "https://staging.exploremap.io",
+    ];
+
+    const origin = req.headers.get("Origin") || "";
+
+    if (allowedOrigins.includes(origin)) {
+      corsHeaders["Access-Control-Allow-Origin"] = origin;
+    }
+
+    // Handle CORS preflight request
+    if (req.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders,
+      });
+    }
+
     const { stravaId } = await req.json();
+    console.log("Strava ID:", stravaId);
 
     // Check if a task with the same stravaId is already in progress
     const { data: existingTask, error: existingTaskError } = await supabase
       .from("exploremap_tasks")
-      .select("id, status")
+      .select("id, status, updated_at")
       .eq("strava_id", stravaId)
       .eq("status", "in_progress")
       .single();
 
     if (existingTaskError && existingTaskError.code !== "PGRST116") {
-      // Ignore "no rows" error
       throw new Error("Error checking for existing task");
     }
 
     if (existingTask) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "An identical task is already in progress",
-        }),
-        { status: 409 } // Conflict
-      );
+      // Check if the last task was more than 5 minutes ago
+      const lastUpdated = new Date(existingTask.updated_at);
+      const now = new Date();
+      const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+
+      if (lastUpdated < fiveMinutesAgo) {
+        // Mark the old task as completed
+        await supabase
+          .from("exploremap_tasks")
+          .update({
+            status: "completed",
+            data: { message: "Automatically completed after timeout" },
+          })
+          .eq("id", existingTask.id);
+      } else {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            message: "An identical task is already in progress",
+          }),
+          {
+            status: 409, // Conflict
+            headers: corsHeaders,
+          }
+        );
+      }
     }
 
     // Insert a new task record into the tasks table
@@ -117,7 +164,10 @@ serve(async (req) => {
         success: true,
         message: "Activities fetched and stored",
       }),
-      { status: 200 }
+      {
+        status: 200,
+        headers: corsHeaders,
+      }
     );
   } catch (error) {
     console.error("Error:", error);
@@ -132,7 +182,10 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: false, message: error.message }),
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 });
