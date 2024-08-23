@@ -73,33 +73,18 @@ export const ActivityTable = ({
   };
 
   const syncActivitiesWithStrava = async (forceReload?: boolean) => {
-    try {
-      setLoading(true);
-      const response = await fetch("/auth/get-activities", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          forceReload,
-        }),
-      });
+    setLoadingMessage("Syncing activities with Strava...");
+    const { data, error } = await supabase.functions.invoke('fetch-strava-activities', {
+      body: { stravaId: userData.strava_id }
+      
+    })
 
-      if (!response.ok) {
-        throw new Error("Failed to sync activities with Strava");
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        setActivities(data.activities);
-      } else {
-        throw new Error(data.message || "Unknown error occurred");
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    console.log(data)
+    
+    if (error) {
+      setError(error.message);
+    } else {
+      fetchActivitiesFromSupabase();
     }
   };
 
