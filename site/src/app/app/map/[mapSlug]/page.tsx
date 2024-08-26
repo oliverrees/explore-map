@@ -21,7 +21,7 @@ export default function MapPage() {
   return (
     <>
       <MapStats data={data} />
-      <div className="h-full pb-[4.5rem] lg:pb-0">
+      <div className="h-full pb-[4.5rem] relative lg:pb-0">
         <Map data={data} isPublic={false} />
       </div>
     </>

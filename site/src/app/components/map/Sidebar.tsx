@@ -3,12 +3,12 @@ import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import INFO_NOTES from "../../data/infoNotes.json";
 import { InfoWindow } from "./InfoWindow";
 import { LoadingSpinner } from "../LoadingSpinner";
-// import Weather from "./Weather";
+import { TwitterTweetEmbed } from "react-twitter-embed";
 
 interface sidebarProps {
-  activityData: any;
   open: boolean;
   onClose: () => void;
   activityId: number;
@@ -16,16 +16,14 @@ interface sidebarProps {
 }
 
 export const revalidate = 600;
-const infoNotes: any = {};
+const infoNotes: any = INFO_NOTES;
 
 export default function Sidebar({
   open,
   onClose,
-  activityData,
   activityId,
   mapId,
 }: sidebarProps) {
-  const [weather, setWeather] = useState<any>(null);
   const [activityInfo, setActivityInfo] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +36,6 @@ export default function Sidebar({
 
   useEffect(() => {
     const getActivityInfo = async () => {
-      // post response with activity id
       const response = await fetch("/api/get-info", {
         method: "POST",
         headers: {
@@ -56,7 +53,7 @@ export default function Sidebar({
     if (open) {
       getActivityInfo();
     }
-  }, [activityId, activityData, mapId, open]);
+  }, [activityId, mapId, open]);
 
   const stravaLink = `https://www.strava.com/activities/${activityInfo?.id}`;
 
@@ -275,10 +272,7 @@ export default function Sidebar({
                           </h3>
                           <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
                             {performanceStats.map((stat, statIdx) => {
-                              if (
-                                (stat.runOnly && activityData.type !== "Run") ||
-                                !stat.value
-                              ) {
+                              if (stat.runOnly || !stat.value) {
                                 return null;
                               }
                               return (
@@ -317,9 +311,48 @@ export default function Sidebar({
                             })}
                           </dl>
 
-                          {/* {weather && (
-                        <Weather weather={weather} date={activityData.date} />
-                      )} */}
+                          {/* Render Embedded YouTube Videos Below Photos */}
+                          {activityInfo?.youtube?.length > 0 && (
+                            <div>
+                              <h3 className="font-medium text-gray-900">
+                                YouTube Videos
+                              </h3>
+                              <div className="w-full mt-4 relative h-56">
+                                <div className="aspect-w-16 aspect-h-9">
+                                  <iframe
+                                    className="absolute inset-0 w-full h-full"
+                                    src={`https://www.youtube.com/embed/${
+                                      activityInfo.youtube[0].videoUrl.split(
+                                        "v="
+                                      )[1]
+                                    }`}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                  ></iframe>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Render Embedded Tweets Below Photos */}
+                          {activityInfo?.tweets?.length > 0 && (
+                            <div>
+                              <h3 className="font-medium text-gray-900">
+                                Tweets
+                              </h3>
+                              <div className="space-y-4 mt-4">
+                                {activityInfo.tweets.map(
+                                  (tweet: any, idx: number) => (
+                                    <TwitterTweetEmbed
+                                      key={idx}
+                                      tweetId={tweet.tweet_id}
+                                    />
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
 
                           <div className="absolute bottom-0 left-0 right-0 w-full">
                             <Link

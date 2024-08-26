@@ -1,13 +1,14 @@
-"use client";
+import React, { useEffect, useState } from "react";
 import polyline from "@mapbox/polyline";
-import React, { Suspense, useEffect, useRef, useState } from "react";
-import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
-import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import Stats from "./Stats";
 import Sidebar from "./Sidebar";
 import { WaitingForDataScreen } from "./WaitingForDataScreen";
 import { WaitingForData } from "./WaitingForData";
+import { getColorFromValue } from "./lib/getColorFromValue";
+import { Layers } from "./Layers";
+import L from "leaflet";
 
 type Props = {
   data: any;
@@ -17,43 +18,53 @@ type Props = {
 const Map = ({ data, isPublic }: Props) => {
   const [showPins, setShowPins] = useState(true);
   const [open, setOpen] = useState(false);
-  const [activityData, setActivityData] = useState({});
   const [activityId, setActivityId] = useState(0);
   const [showSatellite, setShowSatellite] = useState(false);
-  const [animationCoords, setAnimationCoords] = useState<any>([]);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const centerCoords: any = [];
+  const [selectedLayer, setSelectedLayer] = useState("avgSpeeds");
 
-  useEffect(() => {
-    if (isAnimating) {
-      const interval = setInterval(() => {
-        setAnimationCoords((prev: any) => {
-          if (prev.length === combinedCoords.length) {
-            setIsAnimating(false);
-            setAnimationCoords([]);
-            return prev;
-          }
-          return [...prev, combinedCoords[prev.length]];
-        });
-      }, 5);
-      return () => clearInterval(interval);
-    }
-  }, [isAnimating]);
+  const centerCoords: any = [data.centerPoint];
+
+  const minMaxValues: any = {
+    avgSpeeds: [
+      Math.min(...(data.avgSpeeds || [])),
+      Math.max(...(data.avgSpeeds || [])),
+    ],
+    totalElevationGains: [
+      Math.min(...(data.totalElevationGains || [])),
+      Math.max(...(data.totalElevationGains || [])),
+    ],
+    avgHeartrates: [
+      Math.min(...(data.avgHeartrates || [])),
+      Math.max(...(data.avgHeartrates || [])),
+    ],
+    avgTemp: [
+      Math.min(...(data.avgTemp || [])),
+      Math.max(...(data.avgTemp || [])),
+    ],
+    rainSum: [
+      Math.min(...(data.rainSum || [])),
+      Math.max(...(data.rainSum || [])),
+    ],
+    windSpeed: [
+      Math.min(...(data.windSpeed || [])),
+      Math.max(...(data.windSpeed || [])),
+    ],
+    maxHeartRates: [
+      Math.min(...(data.maxHeartRates || [])),
+      Math.max(...(data.maxHeartRates || [])),
+    ],
+  };
+
+  const [minValue, maxValue] = minMaxValues[selectedLayer] || [];
 
   const coords = data.polyLines.map((line: any, indx: number) => {
     const activityId = data.activityIds[indx];
-
     const coords = polyline.decode(line);
-    if (activityId === data.mostRecentActivityId) {
+    if (activityId === data.mostRecentActivityId && !data.centerPoint) {
       centerCoords.push(coords[coords.length - 1]);
     }
-
     return { coords };
   });
-
-  const combinedCoords = coords.reduce((acc: any, val: any) => {
-    return acc.concat(val.coords);
-  }, []);
 
   if (!data) return null;
   if (coords.length === 0)
@@ -86,12 +97,20 @@ const Map = ({ data, isPublic }: Props) => {
         onChangeShowPins={onChangeShowPins}
         onChangeShowSatellite={onChangeShowSatellite}
       />
+      <Layers
+        data={data}
+        selectedLayer={selectedLayer}
+        setSelectedLayer={(layer: string) => {
+          setSelectedLayer(layer);
+        }}
+        minValue={minValue}
+        maxValue={maxValue}
+      />
 
       <div className="w-full h-full relative z-0">
         <Sidebar
           open={open}
           onClose={() => setOpen(false)}
-          activityData={activityData}
           activityId={activityId}
           mapId={data.mapId}
         />
@@ -107,61 +126,66 @@ const Map = ({ data, isPublic }: Props) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url={tileUrl}
           />
-          {!isAnimating ? (
-            coords.map((activity: any, i: number) => {
-              // Check if there in a lat and lng
-              if (!activity.coords[0]) return null;
-              return (
-                <div key={i}>
-                  <Polyline
-                    pathOptions={{
-                      fillColor: "rgb(37 99 235)",
-                      color: "rgb(37 99 235)",
+          {coords.map((activity: any, i: number) => {
+            // Safely access the selected layer data
+            const layerData = data[`${selectedLayer}`] || [];
+            const color =
+              selectedLayer === "None"
+                ? "rgb(37 99 235)"
+                : getColorFromValue(
+                    layerData[i] !== undefined ? layerData[i] : minValue, // Default to minValue if undefined
+                    minValue,
+                    maxValue
+                  );
+
+            // Generate a colored marker icon
+            const markerIcon = L.divIcon({
+              html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path fill="${color}" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 10.5c-1.93 0-3.5-1.57-3.5-3.5S10.07 5.5 12 5.5 15.5 7.07 15.5 9 13.93 12.5 12 12.5z"></path></svg>`,
+              className: "",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+            });
+
+            const markerImage = L.icon({
+              iconUrl: "/marker.png",
+              iconSize: [25, 36],
+              iconAnchor: [12, 36],
+              popupAnchor: [1, -34],
+            });
+
+            // Check if there is a lat and lng
+            if (!activity.coords[0]) return null;
+            return (
+              <div key={i}>
+                <Polyline
+                  pathOptions={{
+                    fillColor: color,
+                    color: color,
+                    weight: 5,
+                  }}
+                  positions={activity.coords}
+                />
+
+                {showPins && (
+                  <Marker
+                    icon={selectedLayer === "None" ? markerImage : markerIcon}
+                    eventHandlers={{
+                      click: (e) => {
+                        setActivityId(data.activityIds[i]);
+                        setOpen(true);
+                      },
                     }}
-                    positions={activity.coords}
+                    position={[
+                      activity.coords[activity.coords.length - 1][0],
+                      activity.coords[activity.coords.length - 1][1],
+                    ]}
                   />
-                  {showPins && (
-                    <Marker
-                      icon={L.icon({
-                        iconUrl: "/marker.png",
-                        iconSize: [27, 40],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                      })}
-                      eventHandlers={{
-                        click: (e) => {
-                          setActivityId(data.activityIds[i]);
-                          setOpen(true);
-                        },
-                      }}
-                      position={[
-                        activity.coords[activity.coords.length - 1][0],
-                        activity.coords[activity.coords.length - 1][1],
-                      ]}
-                    />
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            <Polyline
-              pathOptions={{
-                fillColor: "rgb(37 99 235)",
-                color: "rgb(37 99 235)",
-              }}
-              positions={animationCoords}
-            />
-          )}
+                )}
+              </div>
+            );
+          })}
         </MapContainer>
       </div>
-      {/* <div className="absolute bottom-0 left-0 z-10">
-        <button
-          onClick={() => setIsAnimating(!isAnimating)}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Animate
-        </button>
-      </div> */}
     </>
   );
 };

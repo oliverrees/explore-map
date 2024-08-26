@@ -23,7 +23,6 @@ export async function POST(request: Request) {
       .from("exploremap_maps")
       .select("*")
       .eq("map_id", mapId)
-      .eq("is_shared", true)
       .single();
 
     if (mapError) {
@@ -52,6 +51,25 @@ export async function POST(request: Request) {
     if (!activity) {
       return NextResponse.json({ error: "Error" }, { status: 404 });
     }
+
+    // Calculate the start and end of the day for the activity's start_date
+    const activityStartDate = new Date(activity.activity_data.start_date);
+    const startOfDay = new Date(
+      activityStartDate.getFullYear(),
+      activityStartDate.getMonth(),
+      activityStartDate.getDate(),
+      0,
+      0,
+      0
+    ).toISOString();
+    const endOfDay = new Date(
+      activityStartDate.getFullYear(),
+      activityStartDate.getMonth(),
+      activityStartDate.getDate(),
+      23,
+      59,
+      59
+    ).toISOString();
 
     // Check if photos need to be fetched and stored
     if (activity?.activity_data?.total_photo_count > 0 && !activity?.photos) {
@@ -83,7 +101,37 @@ export async function POST(request: Request) {
       id: activity.activity_id,
       type: activity?.activity_data?.type,
       photos: activity?.photos?.primary?.urls || null,
+      tweets: null as any[] | null,
+      youtube: null as any[] | null,
     };
+
+    if (map.strava_id === "22704023") {
+      // Fetch tweets that were created on the same day as the activity
+      let { data: retrievedTweets, error: tweetError } = await supabase
+        .from("exploremap_tweets")
+        .select("*")
+        .eq("strava_id", parseInt(map.strava_id))
+        .gte("created_at", startOfDay)
+        .lte("created_at", endOfDay);
+
+      if (tweetError) {
+        return NextResponse.json({ error: "Tweet Error" }, { status: 500 });
+      }
+
+      let { data: retrievedYoutube, error: youtubeError } = await supabase
+        .from("exploremap_youtube")
+        .select("*")
+        .eq("stravaId", parseInt(map.strava_id))
+        .gte("publishedAt", startOfDay)
+        .lte("publishedAt", endOfDay);
+
+      if (youtubeError) {
+        return NextResponse.json({ error: "Youtube Error" }, { status: 500 });
+      }
+
+      returnObj.tweets = retrievedTweets;
+      returnObj.youtube = retrievedYoutube as any[] | null;
+    }
 
     return NextResponse.json(returnObj);
   } catch (error) {

@@ -279,7 +279,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                       ))}
                     </MenuItems>
                     <MenuButton className="-m-1.5 flex items-center p-1.5">
-                      <Image
+                      <img
                         alt=""
                         src={userData.athelete_info.profile_medium}
                         height={32}
@@ -362,7 +362,7 @@ export const UserContainer = ({ children }: { children: React.ReactNode }) => {
                 <Menu as="div" className="relative">
                   <MenuButton className="-m-1.5 flex items-center p-1.5">
                     <span className="sr-only">Open user menu</span>
-                    <Image
+                    <img
                       alt=""
                       src={userData.athelete_info.profile_medium}
                       height={32}

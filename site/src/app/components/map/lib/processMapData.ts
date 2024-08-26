@@ -2,6 +2,7 @@ interface Activity {
   activity_data: any;
   activity_id: number;
   strava_id: number;
+  weather: any;
 }
 
 export const processMapData = (
@@ -38,6 +39,21 @@ export const processMapData = (
     0
   );
 
+  // Array of avg speeds
+  const avgSpeeds = activitiesData.map((activity: Activity) => {
+    return activity.activity_data.average_speed || 0;
+  });
+
+  // Array of avg heartrates
+  const avgHeartrates = activitiesData.map((activity: Activity) => {
+    return activity.activity_data.average_heartrate || 0;
+  });
+
+  // Array of total_elevation_gain
+  const totalElevationGains = activitiesData.map((activity: Activity) => {
+    return activity.activity_data.total_elevation_gain || 0;
+  });
+
   const startDate = new Date(
     Math.min(
       ...activitiesData.map(
@@ -52,6 +68,29 @@ export const processMapData = (
       )
     )
   );
+
+  // Array of avg temperatures
+  const avgTemp = activitiesData.map(
+    (activity: Activity) => activity.weather?.temperature_2m_mean || 0
+  );
+
+  // Array of rain sum
+  const rainSum = activitiesData.map(
+    (activity: Activity) => activity.weather?.rain_sum || 0
+  );
+
+  // Array of wind speed
+  const windSpeed = activitiesData.map(
+    (activity: Activity) => activity.weather?.wind_speed_10m_max || 0
+  );
+
+  // Array of max heart rates
+  const maxHeartRates = activitiesData.map(
+    (activity: Activity) => activity.activity_data.max_heartrate || 0
+  );
+
+  // Calculate center point
+  const centerPoint = mapData.center_lat_lng || [];
 
   // Most recent activity Id
   const mostRecentActivityId = activitiesData.reduce(
@@ -81,12 +120,21 @@ export const processMapData = (
     slug: mapData.slug,
     createdAt: mapData.created_at,
     mostRecentActivityId: mostRecentActivityId.id,
+    avgSpeeds,
+    avgHeartrates,
+    avgTemp,
+    rainSum,
+    windSpeed,
+    totalElevationGains,
+    centerPoint,
+    maxHeartRates,
   };
 
   if (isOwner) {
     return {
       ...standardObject,
       mapData,
+      activitiesData,
     };
   }
   return standardObject;
