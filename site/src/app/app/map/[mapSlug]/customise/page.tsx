@@ -18,10 +18,10 @@ export default function MapPage() {
     data.mapData.zoom_level ?? 0
   );
   const [centerLat, setCenterLat] = useState<string>(
-    data.mapData.center_lat_lng[0] ?? 0
+    data.mapData?.center_lat_lng?.[0] ?? 0
   );
   const [centerLon, setCenterLon] = useState<string>(
-    data.mapData.center_lat_lng[1] ?? 0
+    data.mapData?.center_lat_lng?.[1] ?? 0
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -97,7 +97,7 @@ export default function MapPage() {
       setProgress(Math.round(((i + 1) / totalActivities) * 100));
 
       // Delay to prevent overwhelming the API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     setLoading(false);

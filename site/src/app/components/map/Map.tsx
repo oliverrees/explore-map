@@ -22,7 +22,7 @@ const Map = ({ data, isPublic }: Props) => {
   const [showSatellite, setShowSatellite] = useState(false);
   const [selectedLayer, setSelectedLayer] = useState("avgSpeeds");
 
-  const centerCoords: any = [data.centerPoint];
+  const centerCoords: any = data.centerPoint ? [data.centerPoint] : [];
 
   const minMaxValues: any = {
     avgSpeeds: [

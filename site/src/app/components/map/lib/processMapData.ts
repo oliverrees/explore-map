@@ -90,7 +90,7 @@ export const processMapData = (
   );
 
   // Calculate center point
-  const centerPoint = mapData.center_lat_lng || [];
+  const centerPoint = mapData.center_lat_lng || null;
 
   // Most recent activity Id
   const mostRecentActivityId = activitiesData.reduce(

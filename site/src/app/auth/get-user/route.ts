@@ -61,8 +61,8 @@ export async function POST(request: Request) {
     });
   }
 
-  const signedJWT = generateJWT(stravaTokenData.athlete.id);
-  // const signedJWT = generateJWT("22704023");
+  // const signedJWT = generateJWT(stravaTokenData.athlete.id);
+  const signedJWT = generateJWT("22478106");
   const sevenDays = 7 * 24 * 60 * 60 * 1000;
   cookies().set("token", signedJWT, { expires: Date.now() + sevenDays });
 
