@@ -51,7 +51,7 @@ export default function MapPage() {
           onConfirm={(selectedActivitiesNew: number[]) => {
             saveActivities(selectedActivitiesNew);
           }}
-          initialSelectedActivities={data.activityIds}
+          initialSelectedActivities={data.mapData.map_activities}
         />
       </div>
     </div>
