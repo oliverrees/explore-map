@@ -1,9 +1,7 @@
-import polyline from "@mapbox/polyline";
 import { supabase } from "../../../../lib/supabase/supabaseService";
 import { MapHolder } from "./components/MapHolder";
 import { processMapData } from "@/app/components/map/lib/processMapData";
 import { EmptyScreen } from "@/app/components/map/EmptyScreen";
-import type { Metadata } from "next";
 
 export const revalidate = 5;
 
@@ -20,12 +18,10 @@ export async function generateMetadata({
   }
   const fetchMapTitle = async () => {
     try {
-      const adaptedSlug =
-        mapSlug === "cromer-to-lands-end-1" ? "cromer-to-lands-end" : mapSlug;
       const { data: mapData, error: mapError } = await supabase
         .from("exploremap_maps")
         .select("map_name")
-        .eq("slug", adaptedSlug)
+        .eq("slug", mapSlug)
         .eq("is_shared", true)
         .single();
       if (mapError) throw new Error(mapError.message);
@@ -60,12 +56,10 @@ export default async function Page({
     }
     try {
       // Fetch the map activities from the exploremap_maps table
-      const adaptedSlug =
-        mapSlug === "cromer-to-lands-end-1" ? "cromer-to-lands-end" : mapSlug;
       const { data: mapData, error: mapError } = await supabase
         .from("exploremap_maps")
         .select("*")
-        .eq("slug", adaptedSlug)
+        .eq("slug", mapSlug)
         .eq("is_shared", true)
         .single();
 
@@ -74,7 +68,7 @@ export default async function Page({
       // Fetch the activities details from the exploremap_activities table
       const { data: activitiesData, error: activitiesError } = await supabase
         .from("exploremap_activities")
-        .select("*")
+        .select("weather, photos, activity_id, activity_data")
         .order("activity_id", { ascending: false })
         .in("activity_id", mapData.map_activities);
 

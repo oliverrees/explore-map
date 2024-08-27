@@ -3,34 +3,37 @@ import React from "react";
 import { getColorFromValue } from "./lib/getColorFromValue";
 
 type Props = {
-  data: any;
   selectedLayer: string;
   setSelectedLayer: (layer: string) => void;
-  minValue: number;
-  maxValue: number;
+  minMaxValues: Record<string, [number, number]>;
 };
 
 export const Layers = ({
-  data,
   selectedLayer,
   setSelectedLayer,
-  minValue,
-  maxValue,
+  minMaxValues,
 }: Props) => {
   const layers = [
-    { key: "avgSpeeds", label: "Average Speed", unit: "km/h" },
-    { key: "totalElevationGains", label: "Elevation Gain", unit: "m" },
-    { key: "avgHeartrates", label: "Average Heart Rate", unit: "bpm" },
-    { key: "maxHeartRates", label: "Max Heart Rate", unit: "bpm" },
+    { key: "averageSpeed", label: "Average Speed", unit: "km/h" },
+    { key: "totalElevationGain", label: "Elevation Gain", unit: "m" },
+    { key: "averageHeartrate", label: "Average Heart Rate", unit: "bpm" },
+    { key: "maxHeartrate", label: "Max Heart Rate", unit: "bpm" },
     { key: "avgTemp", label: "Temperature", unit: "°C" },
     { key: "rainSum", label: "Rainfall", unit: "mm" },
     { key: "windSpeed", label: "Wind Speed", unit: "m/s" },
     { key: "None", label: "None", unit: "" },
   ];
 
+  const minValue = minMaxValues[selectedLayer][0] ?? null;
+  const maxValue = minMaxValues[selectedLayer][1] ?? null;
+
   const gradientColors = Array.from({ length: 100 }, (_, i) => {
     const value = minValue + (i / 99) * (maxValue - minValue);
-    return getColorFromValue(value, minValue, maxValue);
+    return getColorFromValue(value, minValue, maxValue, selectedLayer);
+  });
+
+  const filteredLayers = layers.filter((layer) => {
+    return minMaxValues[layer.key]?.[0] != Infinity;
   });
 
   return (
@@ -51,7 +54,7 @@ export const Layers = ({
               setSelectedLayer(e.target.value);
             }}
           >
-            {layers.map((layer) => (
+            {filteredLayers.map((layer) => (
               <SelectItem key={layer.key} value={layer.key}>
                 {layer.label}
               </SelectItem>

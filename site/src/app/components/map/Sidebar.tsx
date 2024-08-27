@@ -7,6 +7,7 @@ import INFO_NOTES from "../../data/infoNotes.json";
 import { InfoWindow } from "./InfoWindow";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { TwitterTweetEmbed } from "react-twitter-embed";
+import { ActivityDetailChart } from "./ActivityDetailChart";
 
 interface sidebarProps {
   open: boolean;
@@ -26,7 +27,7 @@ export default function Sidebar({
 }: sidebarProps) {
   const [activityInfo, setActivityInfo] = useState<any>({});
   const [loading, setLoading] = useState(true);
-
+  console.log(activityInfo.activity_detail);
   const closeSidebar = () => {
     onClose();
     setTimeout(() => {
@@ -60,18 +61,6 @@ export default function Sidebar({
   // Define categories
   const timingStats = [
     {
-      name: "Start Date",
-      value: activityInfo?.start_date
-        ? format(new Date(activityInfo?.start_date), "dd/MM/yyyy")
-        : null,
-    },
-    {
-      name: "Moving Time",
-      value: activityInfo?.moving_time
-        ? new Date(activityInfo?.moving_time * 1000).toISOString().substr(11, 8)
-        : null,
-    },
-    {
       name: "Total Time",
       value: activityInfo?.elapsed_time
         ? new Date(activityInfo?.elapsed_time * 1000)
@@ -80,34 +69,47 @@ export default function Sidebar({
         : null,
     },
     {
-      name: "Time Zone",
-      value: activityInfo?.timezone,
+      name: "Distance Covered",
+      value: activityInfo?.distance
+        ? (activityInfo?.distance / 1000).toFixed(2) + " km"
+        : null,
+      unit: "km",
     },
   ];
 
   const performanceStats = [
     {
-      name: "Distance Covered",
-      value: activityInfo?.distance
-        ? (activityInfo?.distance / 1000).toFixed(2)
-        : null,
-      unit: "km",
-    },
-    {
       name: "Average Cadence",
       value: activityInfo?.average_cadence,
       unit: "spm",
       runOnly: true,
+      chart: true,
+      chartKey: "averageCadence",
+      chartColor: "#34d399",
     },
     {
       name: "Average Heart Rate",
       value: activityInfo?.average_heartrate,
       unit: "bpm",
+      chart: true,
+      chartKey: "averageHeartrates",
+      chartColor: "#f87171",
+    },
+    {
+      name: "Max Heart Rate",
+      value: activityInfo?.max_heartrate,
+      unit: "bpm",
+      chart: true,
+      chartKey: "maxHeartrates",
+      chartColor: "#f87171",
     },
     {
       name: "Average Power",
       value: activityInfo?.average_watts,
       unit: "watts",
+      chart: true,
+      chartKey: "averageWatts",
+      chartColor: "#60a5fa",
     },
     {
       name: "Average Speed",
@@ -115,11 +117,9 @@ export default function Sidebar({
         ? (activityInfo?.average_speed * 3.6).toFixed(2)
         : null,
       unit: "km/h",
-    },
-    {
-      name: "Max Heart Rate",
-      value: activityInfo?.max_heartrate,
-      unit: "bpm",
+      chart: true,
+      chartKey: "averageSpeeds",
+      chartColor: "#60a5fa",
     },
     {
       name: "Max Speed",
@@ -137,6 +137,14 @@ export default function Sidebar({
 
   const conditionStats = [
     {
+      name: "Elevation Gain",
+      value: activityInfo?.total_elevation_gain,
+      unit: "m",
+      chart: true,
+      chartKey: "totalElevationGains",
+      chartColor: "#34d399",
+    },
+    {
       name: "Elevation High",
       value: activityInfo?.elev_high,
       unit: "m",
@@ -147,9 +155,24 @@ export default function Sidebar({
       unit: "m",
     },
     {
-      name: "Elevation Gain",
-      value: activityInfo?.total_elevation_gain,
-      unit: "m",
+      name: "Avg Temperature",
+      value: activityInfo?.weather?.temperature_2m_mean,
+      unit: "°C",
+    },
+    {
+      name: "Wind Speed",
+      value: activityInfo?.weather?.wind_speed_10m_max,
+      unit: "m/s",
+    },
+    {
+      name: "Rainfall",
+      value: activityInfo?.weather?.precipitation_sum,
+      unit: "mm",
+    },
+    {
+      name: "Snowfall",
+      value: activityInfo?.weather?.snowfall_sum,
+      unit: "mm",
     },
   ];
 
@@ -215,7 +238,7 @@ export default function Sidebar({
                                 <h2 className="font-semibold leading-6 text-xl text-gray-900">
                                   {activityInfo?.name}
                                 </h2>
-                                <p className="mt-3 text-sm text-gray-500">
+                                <p className="mt-1 lg:mt-3 text-sm text-gray-500">
                                   {activityInfo?.start_date &&
                                     format(
                                       new Date(activityInfo?.start_date),
@@ -247,7 +270,6 @@ export default function Sidebar({
                             </InfoWindow>
                           )}
 
-                          <h3 className="font-medium text-gray-900">Timing</h3>
                           <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
                             {timingStats.map((stat, statIdx) => {
                               if (stat.value === null) {
@@ -270,20 +292,37 @@ export default function Sidebar({
                           <h3 className="font-medium text-gray-900">
                             Performance Metrics
                           </h3>
-                          <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                          <dl className="mt-2 gap-3 grid grid-cols-2">
                             {performanceStats.map((stat, statIdx) => {
                               if (stat.runOnly || !stat.value) {
                                 return null;
                               }
                               return (
                                 <div
-                                  className="flex justify-between py-3 text-sm font-medium"
+                                  className="flex flex-col bg-gray-50 overflow-hidden rounded shadow"
                                   key={statIdx}
                                 >
-                                  <dt className="text-gray-500">{stat.name}</dt>
-                                  <dd className="text-gray-900">
-                                    {stat.value} {stat.unit}
-                                  </dd>
+                                  {stat.chart &&
+                                    activityInfo.activity_detail && (
+                                      <div className="h-12 transform scale-110 -mb-3 pt-1">
+                                        <ActivityDetailChart
+                                          chartColor={stat.chartColor}
+                                          chartData={
+                                            activityInfo.activity_detail
+                                          }
+                                          chartKey={stat.chartKey}
+                                          activityId={activityInfo.id}
+                                        />
+                                      </div>
+                                    )}
+                                  <div className="flex justify-between flex-col py-3 text-sm font-medium p-3">
+                                    <dt className="text-gray-500 text-xs">
+                                      {stat.name}
+                                    </dt>
+                                    <dd className="text-gray-900">
+                                      {stat.value} {stat.unit}
+                                    </dd>
+                                  </div>
                                 </div>
                               );
                             })}
@@ -292,20 +331,40 @@ export default function Sidebar({
                           <h3 className="font-medium text-gray-900">
                             Conditions
                           </h3>
-                          <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                          <dl className="mt-2 gap-3 grid grid-cols-2">
                             {conditionStats.map((stat, statIdx) => {
-                              if (stat.value === null) {
+                              if (!stat.value) {
                                 return null;
                               }
                               return (
                                 <div
-                                  className="flex justify-between py-3 text-sm font-medium"
+                                  className={`flex flex-col bg-gray-50 overflow-hidden rounded shadow ${
+                                    stat.name === "Elevation Gain" &&
+                                    "col-span-2"
+                                  }`}
                                   key={statIdx}
                                 >
-                                  <dt className="text-gray-500">{stat.name}</dt>
-                                  <dd className="text-gray-900">
-                                    {stat.value} {stat.unit && stat.unit}
-                                  </dd>
+                                  {stat.chart &&
+                                    activityInfo.activity_detail && (
+                                      <div className="h-12 transform scale-105 py-2">
+                                        <ActivityDetailChart
+                                          chartColor={stat.chartColor}
+                                          chartData={
+                                            activityInfo.activity_detail
+                                          }
+                                          chartKey={stat.chartKey}
+                                          activityId={activityInfo.id}
+                                        />
+                                      </div>
+                                    )}
+                                  <div className="flex justify-between flex-col py-3 text-sm font-medium p-3">
+                                    <dt className="text-gray-500 text-xs">
+                                      {stat.name}
+                                    </dt>
+                                    <dd className="text-gray-900">
+                                      {stat.value} {stat.unit}
+                                    </dd>
+                                  </div>
                                 </div>
                               );
                             })}

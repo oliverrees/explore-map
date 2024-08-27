@@ -35,7 +35,8 @@
     "react-leaflet": "^4.2.1",
     "react-transition-progress": "^0.0.4",
     "react-twitter-embed": "^4.0.4",
-    "react-youtube": "^10.1.0"
+    "react-youtube": "^10.1.0",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@types/d3-scale": "^4.0.8",

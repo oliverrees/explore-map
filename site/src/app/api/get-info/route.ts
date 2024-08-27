@@ -103,6 +103,8 @@ export async function POST(request: Request) {
       photos: activity?.photos?.primary?.urls || null,
       tweets: null as any[] | null,
       youtube: null as any[] | null,
+      activity_detail: activity?.activity_detail,
+      weather: activity?.weather,
     };
 
     if (map.strava_id === "22704023") {

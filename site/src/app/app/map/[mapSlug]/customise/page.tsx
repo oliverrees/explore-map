@@ -46,63 +46,6 @@ export default function MapPage() {
     }
   };
 
-  const getWeatherData = async () => {
-    setLoading(true);
-    const activities = data.activitiesData;
-    const totalActivities = activities.length;
-
-    for (let i = 0; i < totalActivities; i++) {
-      // Check if activity already has weather data
-      if (activities[i].weather) {
-        continue;
-      }
-      const activity = activities[i];
-      const startLat = activity.activity_data.start_latlng[0];
-      const startLon = activity.activity_data.start_latlng[0];
-      // check if there is a lat and lon
-      if (!startLat || !startLon) {
-        continue;
-      }
-      const startDate = new Date(activity.activity_data.start_date)
-        .toISOString()
-        .split("T")[0];
-
-      try {
-        const response = await fetch(
-          `https://archive-api.open-meteo.com/v1/archive?latitude=${startLat}&longitude=${startLon}&start_date=${startDate}&end_date=${startDate}&daily=weather_code,temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,rain_sum,snowfall_sum,wind_speed_10m_max`
-        );
-
-        const weatherData = await response.json();
-
-        if (weatherData && weatherData.daily) {
-          const weather = weatherData.daily;
-
-          const { error } = await supabase
-            .from("exploremap_activities")
-            .update({ weather })
-            .eq("id", activity.id);
-
-          if (error) {
-            console.error(`Error updating activity ${activity.id}:`, error);
-          }
-        }
-      } catch (err) {
-        console.error(
-          `Error fetching weather for activity ${activity.id}:`,
-          err
-        );
-      }
-
-      // Update progress
-      setProgress(Math.round(((i + 1) / totalActivities) * 100));
-
-      // Delay to prevent overwhelming the API
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
-
-    setLoading(false);
-  };
-
   return (
     <>
       <UserMaxWidth>
@@ -182,32 +125,6 @@ export default function MapPage() {
                 }}
               />
             </div>
-          </Field>
-        </CardHolder>
-        <CardHolder classNames="px-4 pb-6 sm:px-6 lg:px-8 bg-white pt-6 lg:mt-6">
-          <Field className="flex items-start gap-4 justify-between flex-col">
-            <span className="flex flex-grow flex-col pr-4">
-              <Label
-                as="span"
-                passive
-                className="text-base font-medium leading-6 text-gray-900"
-              >
-                Weather
-              </Label>
-              <Description
-                as="span"
-                className="text-xs lg:text-base font-light text-gray-500 mt-1"
-              >
-                Add weather data to your map.
-              </Description>
-            </span>
-            <button
-              className="text-blue-500 font-medium text-sm lg:text-base border w-full px-4 py-2 border-blue-500 rounded"
-              onClick={getWeatherData}
-              disabled={loading}
-            >
-              {loading ? `Progress: ${progress}%` : "Get weather data"}
-            </button>
           </Field>
         </CardHolder>
         <button

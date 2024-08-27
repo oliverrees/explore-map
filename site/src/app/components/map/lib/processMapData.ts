@@ -3,6 +3,13 @@ interface Activity {
   activity_id: number;
   strava_id: number;
   weather: any;
+  activity_detail: {
+    distances: number[];
+    average_speeds: number[];
+    max_heartrates: number[];
+    average_heartrates: number[];
+    total_elevation_gains: number[];
+  };
 }
 
 export const processMapData = (
@@ -10,49 +17,51 @@ export const processMapData = (
   activitiesData: any,
   isOwner?: boolean
 ) => {
-  const polyLines = activitiesData.map((activity: Activity) => {
-    return activity.activity_data.map?.summary_polyline || "";
+  let lastCoords: any = [];
+
+  const activities = activitiesData.map((activity: Activity) => {
+    const polyline = activity.activity_data?.map?.summary_polyline || "";
+    const distance = activity.activity_data?.distance;
+    const elapsedTime = activity.activity_data?.elapsed_time;
+    const elevationGain = activity.activity_data?.total_elevation_gain;
+    const averageSpeed = activity.activity_data?.average_speed * 3.6; // Convert m/s to km/h
+    const averageHeartrate = activity.activity_data?.average_heartrate;
+    const maxHeartrate = activity.activity_data?.max_heartrate;
+    const avgTemp = activity.weather?.temperature_2m_mean?.[0];
+    const rainSum = activity.weather?.rain_sum?.[0];
+    const windSpeed = activity.weather?.wind_speed_10m_max?.[0];
+    // Extract last coordinates
+    lastCoords = activity.activity_data?.end_latlng || [];
+
+    const returnObject = {
+      activityId: activity.activity_id,
+      polyline,
+      distance,
+      elapsedTime,
+      averageSpeed,
+      elevationGain,
+      averageHeartrate,
+      maxHeartrate,
+      avgTemp,
+      rainSum,
+      windSpeed,
+      // segments: activity.activity_detail,
+    };
+    return returnObject;
   });
 
-  // Calculate total distance (you can implement this if needed)
-  const totalDistance = activitiesData.reduce(
-    (total: any, activity: Activity) =>
-      total + (activity.activity_data.distance || 0),
+  const totalDistance = activities.reduce(
+    (total: number, activity: any) => total + activity.distance,
     0
   );
-
-  const activityIds = activitiesData.map(
-    (activity: Activity) => activity.activity_id
-  );
-
-  // Calculate total moving time
-  const totalTime = activitiesData.reduce(
-    (total: any, activity: Activity) =>
-      total + (activity.activity_data.elapsed_time || 0),
+  const totalTime = activities.reduce(
+    (total: any, activity: any) => total + activity.elapsedTime,
     0
   );
-
-  // Calculate total elevation gain
-  const totalElevationGain = activitiesData.reduce(
-    (total: any, activity: Activity) =>
-      total + (activity.activity_data.total_elevation_gain || 0),
+  const totalElevationGain = activities.reduce(
+    (total: any, activity: any) => total + activity.elevationGain,
     0
   );
-
-  // Array of avg speeds
-  const avgSpeeds = activitiesData.map((activity: Activity) => {
-    return activity.activity_data.average_speed || 0;
-  });
-
-  // Array of avg heartrates
-  const avgHeartrates = activitiesData.map((activity: Activity) => {
-    return activity.activity_data.average_heartrate || 0;
-  });
-
-  // Array of total_elevation_gain
-  const totalElevationGains = activitiesData.map((activity: Activity) => {
-    return activity.activity_data.total_elevation_gain || 0;
-  });
 
   const startDate = new Date(
     Math.min(
@@ -69,31 +78,7 @@ export const processMapData = (
     )
   );
 
-  // Array of avg temperatures
-  const avgTemp = activitiesData.map(
-    (activity: Activity) => activity.weather?.temperature_2m_mean || 0
-  );
-
-  // Array of rain sum
-  const rainSum = activitiesData.map(
-    (activity: Activity) => activity.weather?.rain_sum || 0
-  );
-
-  // Array of wind speed
-  const windSpeed = activitiesData.map(
-    (activity: Activity) => activity.weather?.wind_speed_10m_max || 0
-  );
-
-  // Array of max heart rates
-  const maxHeartRates = activitiesData.map(
-    (activity: Activity) => activity.activity_data.max_heartrate || 0
-  );
-
-  // Calculate center point
-  const centerPoint = mapData.center_lat_lng || null;
-
-  // Most recent activity Id
-  const mostRecentActivityId = activitiesData.reduce(
+  const mostRecentActivity = activitiesData.reduce(
     (mostRecent: any, activity: Activity) => {
       if (new Date(activity.activity_data.start_date) > mostRecent.date) {
         return {
@@ -105,29 +90,101 @@ export const processMapData = (
     },
     { date: new Date(0), id: 0 }
   );
+
+  const centerCoords = mapData.center_lat_lng || lastCoords;
+
+  // Calculate min and max values
+  const minMaxValues = {
+    averageSpeed: [
+      Math.min(
+        ...activities
+          .flatMap((a: any) => a.averageSpeed ?? [])
+          .filter((v: any) => v != null)
+      ),
+      Math.max(
+        ...activities
+          .flatMap((a: any) => a.averageSpeed ?? [])
+          .filter((v: any) => v != null)
+      ),
+    ],
+    totalElevationGain: [
+      Math.min(
+        ...activities
+          .flatMap((a: any) => a.elevationGain ?? [])
+          .filter((v: any) => v != null)
+      ),
+      Math.max(
+        ...activities
+          .flatMap((a: any) => a.elevationGain ?? [])
+          .filter((v: any) => v != null)
+      ),
+    ],
+    averageHeartrate: [
+      Math.min(
+        ...activities
+          .flatMap((a: any) => a.averageHeartrate ?? [])
+          .filter((v: any) => v != null)
+      ),
+      Math.max(
+        ...activities
+          .flatMap((a: any) => a.averageHeartrate ?? [])
+          .filter((v: any) => v != null)
+      ),
+    ],
+    maxHeartrate: [
+      Math.min(
+        ...activities
+          .flatMap((a: any) => a.maxHeartrate ?? [])
+          .filter((v: any) => v != null)
+      ),
+      Math.max(
+        ...activities
+          .flatMap((a: any) => a.maxHeartrate ?? [])
+          .filter((v: any) => v != null)
+      ),
+    ],
+    avgTemp: [
+      Math.min(
+        ...activities.map((a: any) => a.avgTemp).filter((v: any) => v != null)
+      ),
+      Math.max(
+        ...activities.map((a: any) => a.avgTemp).filter((v: any) => v != null)
+      ),
+    ],
+    rainSum: [
+      Math.min(
+        ...activities.map((a: any) => a.rainSum).filter((v: any) => v != null)
+      ),
+      Math.max(
+        ...activities.map((a: any) => a.rainSum).filter((v: any) => v != null)
+      ),
+    ],
+    windSpeed: [
+      Math.min(
+        ...activities.map((a: any) => a.windSpeed).filter((v: any) => v != null)
+      ),
+      Math.max(
+        ...activities.map((a: any) => a.windSpeed).filter((v: any) => v != null)
+      ),
+    ],
+  };
+
   const standardObject = {
-    totalActivities: activityIds.length,
-    activityIds,
-    mapId: mapData.map_id,
-    mapName: mapData.map_name,
-    polyLines,
+    totalActivities: activities.length,
     totalDistance,
     totalTime,
     totalElevationGain,
     startDate,
     endDate,
+    mostRecentActivityId: mostRecentActivity.id,
+    mapId: mapData.map_id,
+    mapName: mapData.map_name,
     zoomLevel: mapData.zoom_level,
     slug: mapData.slug,
     createdAt: mapData.created_at,
-    mostRecentActivityId: mostRecentActivityId.id,
-    avgSpeeds,
-    avgHeartrates,
-    avgTemp,
-    rainSum,
-    windSpeed,
-    totalElevationGains,
-    centerPoint,
-    maxHeartRates,
+    centerCoords,
+    activities,
+    minMaxValues, // Include min and max values in the result
   };
 
   if (isOwner) {
@@ -137,5 +194,6 @@ export const processMapData = (
       activitiesData,
     };
   }
+
   return standardObject;
 };

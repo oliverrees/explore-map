@@ -7,7 +7,10 @@ export function getColorFromValue(
   maxValue: number,
   type?: string
 ) {
-  const scheme = type === "temp" ? interpolateYlOrRd : interpolateViridis;
+  const scheme =
+    type === "averageHeartrate" || type === "maxHeartrate"
+      ? interpolateYlOrRd
+      : interpolateViridis;
   // Create a sequential color scale using the Viridis colormap
   const colorScale = scaleSequential(scheme).domain([minValue, maxValue]);
 

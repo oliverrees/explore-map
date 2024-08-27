@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import polyline from "@mapbox/polyline";
 import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -9,65 +9,23 @@ import { WaitingForData } from "./WaitingForData";
 import { getColorFromValue } from "./lib/getColorFromValue";
 import { Layers } from "./Layers";
 import L from "leaflet";
+import * as turf from "@turf/turf";
 
 type Props = {
   data: any;
   isPublic: boolean;
+  useSegments: boolean; // Add the flag as a prop
 };
 
-const Map = ({ data, isPublic }: Props) => {
+const Map = ({ data, isPublic, useSegments }: Props) => {
   const [showPins, setShowPins] = useState(true);
   const [open, setOpen] = useState(false);
   const [activityId, setActivityId] = useState(0);
   const [showSatellite, setShowSatellite] = useState(false);
-  const [selectedLayer, setSelectedLayer] = useState("avgSpeeds");
-
-  const centerCoords: any = data.centerPoint ? [data.centerPoint] : [];
-
-  const minMaxValues: any = {
-    avgSpeeds: [
-      Math.min(...(data.avgSpeeds || [])),
-      Math.max(...(data.avgSpeeds || [])),
-    ],
-    totalElevationGains: [
-      Math.min(...(data.totalElevationGains || [])),
-      Math.max(...(data.totalElevationGains || [])),
-    ],
-    avgHeartrates: [
-      Math.min(...(data.avgHeartrates || [])),
-      Math.max(...(data.avgHeartrates || [])),
-    ],
-    avgTemp: [
-      Math.min(...(data.avgTemp || [])),
-      Math.max(...(data.avgTemp || [])),
-    ],
-    rainSum: [
-      Math.min(...(data.rainSum || [])),
-      Math.max(...(data.rainSum || [])),
-    ],
-    windSpeed: [
-      Math.min(...(data.windSpeed || [])),
-      Math.max(...(data.windSpeed || [])),
-    ],
-    maxHeartRates: [
-      Math.min(...(data.maxHeartRates || [])),
-      Math.max(...(data.maxHeartRates || [])),
-    ],
-  };
-
-  const [minValue, maxValue] = minMaxValues[selectedLayer] || [];
-
-  const coords = data.polyLines.map((line: any, indx: number) => {
-    const activityId = data.activityIds[indx];
-    const coords = polyline.decode(line);
-    if (activityId === data.mostRecentActivityId && !data.centerPoint) {
-      centerCoords.push(coords[coords.length - 1]);
-    }
-    return { coords };
-  });
+  const [selectedLayer, setSelectedLayer] = useState("averageSpeed");
 
   if (!data) return null;
-  if (coords.length === 0)
+  if (data.activities.length === 0)
     return isPublic ? (
       <WaitingForDataScreen />
     ) : (
@@ -88,6 +46,11 @@ const Map = ({ data, isPublic }: Props) => {
     setShowSatellite(satelliteStatus);
   };
 
+  // Define the range for blue shades
+  const maxBlue = 255; // Lightest blue
+  const minBlue = 50; // Darkest blue
+  const stepSize = (maxBlue - minBlue) / (data.activities.length - 1);
+
   return (
     <>
       <Stats
@@ -98,15 +61,10 @@ const Map = ({ data, isPublic }: Props) => {
         onChangeShowSatellite={onChangeShowSatellite}
       />
       <Layers
-        data={data}
         selectedLayer={selectedLayer}
-        setSelectedLayer={(layer: string) => {
-          setSelectedLayer(layer);
-        }}
-        minValue={minValue}
-        maxValue={maxValue}
+        setSelectedLayer={setSelectedLayer}
+        minMaxValues={data.minMaxValues}
       />
-
       <div className="w-full h-full relative z-0">
         <Sidebar
           open={open}
@@ -115,7 +73,7 @@ const Map = ({ data, isPublic }: Props) => {
           mapId={data.mapId}
         />
         <MapContainer
-          center={[centerCoords[0][0], centerCoords[0][1]]}
+          center={data.centerCoords}
           zoom={data.zoomLevel}
           maxZoom={20}
           minZoom={1}
@@ -126,63 +84,195 @@ const Map = ({ data, isPublic }: Props) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url={tileUrl}
           />
-          {coords.map((activity: any, i: number) => {
-            // Safely access the selected layer data
-            const layerData = data[`${selectedLayer}`] || [];
-            const color =
-              selectedLayer === "None"
-                ? "rgb(37 99 235)"
-                : getColorFromValue(
-                    layerData[i] !== undefined ? layerData[i] : minValue, // Default to minValue if undefined
-                    minValue,
-                    maxValue
-                  );
+          {data.activities.map((activity: any, i: number) => {
+            const decodedPolyline = polyline.decode(activity.polyline);
 
-            // Generate a colored marker icon
-            const markerIcon = L.divIcon({
-              html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path fill="${color}" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 10.5c-1.93 0-3.5-1.57-3.5-3.5S10.07 5.5 12 5.5 15.5 7.07 15.5 9 13.93 12.5 12 12.5z"></path></svg>`,
-              className: "",
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-            });
+            // Calculate the shade of blue for this activity
+            const shadeOfBlue = Math.round(maxBlue - i * stepSize);
+            const blue = `rgb(0, 0, ${shadeOfBlue})`;
 
-            const markerImage = L.icon({
-              iconUrl: "/marker.png",
-              iconSize: [25, 36],
-              iconAnchor: [12, 36],
-              popupAnchor: [1, -34],
-            });
+            if (useSegments && activity.segments) {
+              // Render segments if the flag is set to true and segments exist
+              let segmentStartIndex = 0;
 
-            // Check if there is a lat and lng
-            if (!activity.coords[0]) return null;
-            return (
-              <div key={i}>
-                <Polyline
-                  pathOptions={{
-                    fillColor: color,
-                    color: color,
-                    weight: 5,
-                  }}
-                  positions={activity.coords}
-                />
+              return (
+                <div key={i}>
+                  {activity.segments.distances.map(
+                    (distance: number, j: number) => {
+                      const segmentCoords: [number, number][] = [];
+                      let segmentDistanceCovered = 0;
 
-                {showPins && (
-                  <Marker
-                    icon={selectedLayer === "None" ? markerImage : markerIcon}
-                    eventHandlers={{
-                      click: (e) => {
-                        setActivityId(data.activityIds[i]);
-                        setOpen(true);
-                      },
+                      if (segmentStartIndex > 0) {
+                        segmentCoords.push(
+                          decodedPolyline[segmentStartIndex - 1]
+                        );
+                      }
+
+                      for (
+                        let k = segmentStartIndex;
+                        k < decodedPolyline.length;
+                        k++
+                      ) {
+                        const from = decodedPolyline[k];
+                        const to = decodedPolyline[k + 1];
+
+                        if (!to) {
+                          // If 'to' is undefined, just add 'from' and break
+                          segmentCoords.push(from);
+                          break;
+                        }
+
+                        const dist = turf.distance(
+                          turf.point(from),
+                          turf.point(to),
+                          {
+                            units: "meters",
+                          }
+                        );
+
+                        if (segmentDistanceCovered + dist <= distance) {
+                          segmentCoords.push(from);
+                          segmentDistanceCovered += dist;
+                        } else {
+                          const remainingDistance =
+                            distance - segmentDistanceCovered;
+                          const direction = turf.bearing(
+                            turf.point(from),
+                            turf.point(to)
+                          );
+                          const destination = turf.destination(
+                            turf.point(from),
+                            remainingDistance,
+                            direction,
+                            { units: "meters" }
+                          );
+                          segmentCoords.push(
+                            from,
+                            destination.geometry.coordinates as [number, number]
+                          );
+                          segmentStartIndex = k + 1;
+                          break;
+                        }
+
+                        // Handle the last segment correctly
+                        if (k === decodedPolyline.length - 1) {
+                          segmentCoords.push(to);
+                          segmentStartIndex = k + 1;
+                        }
+                      }
+
+                      // Ensure the final segment is pushed if not already handled
+                      if (j === activity.segments.distances.length - 1) {
+                        segmentCoords.push(
+                          ...decodedPolyline.slice(segmentStartIndex)
+                        );
+                      }
+
+                      // Check if selectedLayer exists in segments and minMaxValues
+                      const layerData =
+                        selectedLayer === "avgTemp" ||
+                        selectedLayer === "rainSum" ||
+                        selectedLayer === "windSpeed"
+                          ? activity[selectedLayer]
+                          : activity.segments[selectedLayer]?.[j];
+                      const minMax = data.minMaxValues[selectedLayer];
+
+                      const color =
+                        selectedLayer === "None" || !layerData || !minMax
+                          ? blue
+                          : getColorFromValue(
+                              layerData,
+                              minMax[0],
+                              minMax[1],
+                              selectedLayer
+                            );
+
+                      const markerIcon = L.divIcon({
+                        html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path fill="${color}" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 10.5c-1.93 0-3.5-1.57-3.5-3.5S10.07 5.5 12 5.5 15.5 7.07 15.5 9 13.93 12.5 12 12.5z"></path></svg>`,
+                        className: "",
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                      });
+
+                      return (
+                        <>
+                          {j === activity.segments.distances.length - 1 &&
+                            showPins && (
+                              <Marker
+                                icon={markerIcon}
+                                eventHandlers={{
+                                  click: (e) => {
+                                    setActivityId(activity.activityId);
+                                    setOpen(true);
+                                  },
+                                }}
+                                position={
+                                  segmentCoords[segmentCoords.length - 1]
+                                }
+                              />
+                            )}
+                          {segmentCoords.length > 1 && (
+                            <Polyline
+                              key={`${i}-${j}`}
+                              pathOptions={{
+                                fillColor: color,
+                                color: color,
+                                weight: 3.5,
+                              }}
+                              positions={segmentCoords}
+                            />
+                          )}
+                        </>
+                      );
+                    }
+                  )}
+                </div>
+              );
+            } else {
+              if (!decodedPolyline) return null;
+              // Render the entire polyline if not using segments or if segments don't exist
+              const layerData = activity[selectedLayer];
+              const minMax = data.minMaxValues[selectedLayer];
+              const color =
+                selectedLayer === "None" || !layerData || !minMax
+                  ? blue
+                  : getColorFromValue(
+                      layerData,
+                      minMax[0],
+                      minMax[1],
+                      selectedLayer
+                    );
+              const markerIcon = L.divIcon({
+                html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path fill="${color}" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 10.5c-1.93 0-3.5-1.57-3.5-3.5S10.07 5.5 12 5.5 15.5 7.07 15.5 9 13.93 12.5 12 12.5z"></path></svg>`,
+                className: "",
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+              });
+              return (
+                <div key={i}>
+                  <Polyline
+                    pathOptions={{
+                      fillColor: color,
+                      color: color,
+                      weight: 3.5,
                     }}
-                    position={[
-                      activity.coords[activity.coords.length - 1][0],
-                      activity.coords[activity.coords.length - 1][1],
-                    ]}
+                    positions={decodedPolyline}
                   />
-                )}
-              </div>
-            );
+                  {decodedPolyline[decodedPolyline.length - 1] && showPins && (
+                    <Marker
+                      icon={markerIcon}
+                      eventHandlers={{
+                        click: (e) => {
+                          setActivityId(activity.activityId);
+                          setOpen(true);
+                        },
+                      }}
+                      position={decodedPolyline[decodedPolyline.length - 1]}
+                    />
+                  )}
+                </div>
+              );
+            }
           })}
         </MapContainer>
       </div>
