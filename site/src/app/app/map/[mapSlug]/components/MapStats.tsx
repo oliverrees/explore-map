@@ -39,8 +39,6 @@ export const MapStats = ({ data }: MapSettingsProps) => {
       }
     };
 
-    console.log(data.totalTime);
-
     fetchPageViews();
   }, [data.mapId]);
 

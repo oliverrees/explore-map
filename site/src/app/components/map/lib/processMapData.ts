@@ -107,7 +107,7 @@ export const processMapData = (
           .filter((v: any) => v != null)
       ),
     ],
-    totalElevationGain: [
+    elevationGain: [
       Math.min(
         ...activities
           .flatMap((a: any) => a.elevationGain ?? [])
@@ -184,7 +184,7 @@ export const processMapData = (
     createdAt: mapData.created_at,
     centerCoords,
     activities,
-    minMaxValues, // Include min and max values in the result
+    minMaxValues,
   };
 
   if (isOwner) {

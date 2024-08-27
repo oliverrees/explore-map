@@ -15,7 +15,7 @@ export const Layers = ({
 }: Props) => {
   const layers = [
     { key: "averageSpeed", label: "Average Speed", unit: "km/h" },
-    { key: "totalElevationGain", label: "Elevation Gain", unit: "m" },
+    { key: "elevationGain", label: "Elevation Gain", unit: "m" },
     { key: "averageHeartrate", label: "Average Heart Rate", unit: "bpm" },
     { key: "maxHeartrate", label: "Max Heart Rate", unit: "bpm" },
     { key: "avgTemp", label: "Temperature", unit: "°C" },
@@ -24,8 +24,8 @@ export const Layers = ({
     { key: "None", label: "None", unit: "" },
   ];
 
-  const minValue = minMaxValues[selectedLayer][0] ?? null;
-  const maxValue = minMaxValues[selectedLayer][1] ?? null;
+  const minValue = minMaxValues[selectedLayer]?.[0] ?? null;
+  const maxValue = minMaxValues[selectedLayer]?.[1] ?? null;
 
   const gradientColors = Array.from({ length: 100 }, (_, i) => {
     const value = minValue + (i / 99) * (maxValue - minValue);

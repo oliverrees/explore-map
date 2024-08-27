@@ -27,7 +27,6 @@ export default function Sidebar({
 }: sidebarProps) {
   const [activityInfo, setActivityInfo] = useState<any>({});
   const [loading, setLoading] = useState(true);
-  console.log(activityInfo.activity_detail);
   const closeSidebar = () => {
     onClose();
     setTimeout(() => {
