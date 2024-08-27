@@ -14,9 +14,9 @@ export const Layers = ({
   minMaxValues,
 }: Props) => {
   const layers = [
-    { key: "averageSpeed", label: "Average Speed", unit: "km/h" },
-    { key: "elevationGain", label: "Elevation Gain", unit: "m" },
-    { key: "averageHeartrate", label: "Average Heart Rate", unit: "bpm" },
+    { key: "averageSpeed", label: "Avg Speed", unit: "km/h" },
+    { key: "elevationGain", label: "Elevation", unit: "m" },
+    { key: "averageHeartrate", label: "Avg Heart Rate", unit: "bpm" },
     { key: "maxHeartrate", label: "Max Heart Rate", unit: "bpm" },
     { key: "avgTemp", label: "Temperature", unit: "°C" },
     { key: "rainSum", label: "Rainfall", unit: "mm" },
