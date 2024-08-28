@@ -123,6 +123,24 @@ export async function POST(request: Request) {
       );
 
       console.log(`Activity ${aspect_type}d with ID: ${object_id}`);
+
+      // Get the activity segment and weather data
+      const { data: weatherData } = await supabase.functions.invoke(
+        "fetch-weather-activities",
+        {
+          body: { activityIds: [activityDataProcessed.id] },
+        }
+      );
+
+      const { data: fetchData } = await supabase.functions.invoke(
+        "fetch-strava-activity",
+        {
+          body: {
+            activityIds: [activityDataProcessed.id],
+            stravaId: owner_id,
+          },
+        }
+      );
       return NextResponse.json({
         success: true,
         message: `Activity ${aspect_type}d`,

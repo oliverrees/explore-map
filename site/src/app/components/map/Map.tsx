@@ -31,6 +31,12 @@ const Map = ({ data, isPublic }: Props) => {
       </div>
     );
 
+  if (data.centerCoords.length === 0) {
+    <div className="w-full h-full flex flex-col justify-center items-center gap-4">
+      Error loading GPS data
+    </div>;
+  }
+
   const tileUrl = showSatellite
     ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
     : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";

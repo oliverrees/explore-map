@@ -45,24 +45,6 @@ export async function updateMapsWithNewActivity(
         console.error("Error updating map with new activity:", updateError);
       } else {
         console.log(`Activity ${activityId} added to map ${map.id}`);
-
-        // Get the activity segment and weather data
-        const { data: weatherData } = await supabase.functions.invoke(
-          "fetch-weather-activities",
-          {
-            body: { activityIds: [activityId] },
-          }
-        );
-
-        const { data: activityData } = await supabase.functions.invoke(
-          "fetch-strava-activity",
-          {
-            body: {
-              activityIds: [activityId],
-              stravaId: stravaId,
-            },
-          }
-        );
       }
     } else {
       console.log(
