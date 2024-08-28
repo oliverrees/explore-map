@@ -10,6 +10,8 @@ type Props = {
   onChangeShowSatellite: (satelliteStatus: boolean) => void;
   showSatellite: boolean;
   showPins: boolean;
+  dark: boolean;
+  onChangeDark: (darkStatus: boolean) => void;
 };
 
 export const revalidate = 600;
@@ -20,12 +22,15 @@ const Stats = ({
   showPins,
   showSatellite,
   onChangeShowSatellite,
+  dark,
+  onChangeDark,
 }: Props) => {
+  const isDark = dark || showSatellite;
   return (
     <div className="fixed bottom-0 md:bottom-10 left-0 right-0 md:right-10 md:left-auto overflow-hidden pointer-events-none shadow-lg md:rounded-lg z-20 md:max-w-md w-full">
       <div
         className={`md:bg-white ${
-          showSatellite &&
+          isDark &&
           "text-white md:text-black [text-shadow:_0_1px_1px_rgb(0_0_0_/_80%)] md:[text-shadow:none]"
         }`}
       >
@@ -80,6 +85,8 @@ const Stats = ({
         onChangeShowPins={onChangeShowPins}
         showSatellite={showSatellite}
         onChangeShowSatellite={onChangeShowSatellite}
+        dark={dark}
+        onChangeDark={onChangeDark}
       />
     </div>
   );

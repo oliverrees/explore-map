@@ -63,7 +63,7 @@ export const MapStats = ({ data }: MapSettingsProps) => {
       unit: "",
     },
   ];
-
+  if (!data) return null;
   return (
     <>
       {/* Stats */}

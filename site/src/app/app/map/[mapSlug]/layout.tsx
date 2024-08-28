@@ -34,14 +34,66 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       if (mapError) throw new Error(mapError.message);
 
-      const { data: activitiesData, error: activitiesError } = await supabase
+      const dataToGet =
+        mapData.map_activities.length < 50
+          ? "weather, photos, activity_id, activity_data, activity_detail"
+          : "weather, photos, activity_id, activity_data";
+
+      let { data: activitiesData, error: activitiesError } = await supabase
         .from("exploremap_activities")
-        .select("*")
+        .select(dataToGet)
         .in("activity_id", mapData.map_activities);
 
       if (activitiesError) throw new Error(activitiesError.message);
 
-      const processedData = processMapData(mapData, activitiesData, true);
+      let processedData: any = processMapData(mapData, activitiesData, true);
+
+      let weatherDataFetched = false;
+      let additionalActivityDataFetched = false;
+
+      // Fetch weather data if needed
+      if (processedData.weatherToGet.length > 0) {
+        const { data: weatherData, error: weatherError } =
+          await supabase.functions.invoke("fetch-weather-activities", {
+            body: { activityIds: processedData.weatherToGet },
+          });
+        if (weatherData) {
+          weatherDataFetched = true;
+        }
+      }
+
+      // Fetch additional activity data if needed
+      if (
+        mapData.map_activities.length < 50 &&
+        processedData.activitiesWithSegmentsCount <
+          mapData.map_activities.length
+      ) {
+        const { data: stravaData, error: stravaError } =
+          await supabase.functions.invoke("fetch-strava-activity", {
+            body: {
+              activityIds: processedData.activityIds,
+              stravaId: mapData.strava_id,
+            },
+          });
+        if (stravaData) {
+          additionalActivityDataFetched = true;
+        }
+      }
+
+      // Rerun the activities query if additional data was fetched
+      if (weatherDataFetched || additionalActivityDataFetched) {
+        activitiesData = await supabase
+          .from("exploremap_activities")
+          .select(dataToGet)
+          .in("activity_id", mapData.map_activities);
+
+        if (activitiesError) throw new Error(activitiesError.message);
+
+        // Reprocess map data with the updated activities data
+        processedData = processMapData(mapData, activitiesData.data, true);
+      }
+
+      // Set the processed data
       setData(processedData);
     } catch (error) {
       console.error("Error loading map data:", error);

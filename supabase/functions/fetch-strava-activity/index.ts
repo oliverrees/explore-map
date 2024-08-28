@@ -24,11 +24,11 @@ serve(async (req) => {
 
     const { activityIds, stravaId } = await req.json();
 
-    if (!activityIds || !stravaId) {
+    if (!activityIds || !stravaId || !Array.isArray(activityIds)) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: "Missing required parameters: activityIds or stravaId",
+          message: "Missing or invalid required parameters: activityIds or stravaId",
         }),
         {
           status: 400,
@@ -53,7 +53,6 @@ serve(async (req) => {
       expires_at: userRecord.expires_at,
     };
 
-    // Refresh token if expired
     if (Date.now() / 1000 > stravaTokenData.expires_at) {
       stravaTokenData = await refreshStravaToken(stravaTokenData.refresh_token);
 
@@ -67,12 +66,10 @@ serve(async (req) => {
         .eq("strava_id", userRecord.strava_id);
     }
 
-    // Fetch and process activity details for each activity ID
     for (const activityId of activityIds) {
-      // Fetch the existing activity details from the database
       const { data: existingActivity, error: activityError } = await supabase
         .from("exploremap_activities")
-        .select("activity_detail, weather, activity_data")
+        .select("activity_detail")
         .eq("activity_id", activityId)
         .single();
 
@@ -81,16 +78,14 @@ serve(async (req) => {
         continue;
       }
 
-      let activityDetail, weather;
+      let activityDetail;
 
-      // Check if activity_detail is missing
       if (!existingActivity.activity_detail) {
         const lapsData = await getStravaActivity(
           stravaTokenData.access_token,
           activityId
         );
 
-        // Extract only the necessary fields and store them in arrays
         const distances = lapsData.map((lap: any) => lap.distance);
         const averageSpeeds = lapsData.map((lap: any) => lap.average_speed);
         const totalElevationGains = lapsData.map((lap: any) => lap.total_elevation_gain);
@@ -99,7 +94,6 @@ serve(async (req) => {
         const averageCadence = lapsData.map((lap: any) => lap.average_cadence);
         const averageWatts = lapsData.map((lap: any) => lap.average_watts);
 
-        // Construct the compressed activity data
         activityDetail = {
           distances,
           averageSpeeds,
@@ -109,29 +103,10 @@ serve(async (req) => {
           maxHeartrates,
           averageWatts
         };
-      }
-
-      // Check if weather data is missing
-      if (!existingActivity.weather) {
-        if (existingActivity.activity_data?.start_latlng) {
-          const startDate = existingActivity.activity_data.start_date;
-          const startLat = existingActivity.activity_data.start_latlng[0];
-          const startLon = existingActivity.activity_data.start_latlng[1];
-          const timezone = existingActivity.activity_data.timezone;
-
-          weather = await getWeatherData(startDate, startLat, startLon, timezone);
-        }
-      }
-
-      // Only update the database if new data was fetched
-      if (activityDetail || weather) {
-        const updateData: any = {};
-        if (activityDetail) updateData.activity_detail = activityDetail;
-        if (weather) updateData.weather = weather;
 
         await supabase
           .from("exploremap_activities")
-          .update(updateData)
+          .update({ activity_detail: activityDetail })
           .eq("activity_id", activityId);
       }
     }
@@ -139,7 +114,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Activities updated successfully",
+        message: "Activity details retrieved successfully",
       }),
       {
         status: 200,
@@ -195,30 +170,4 @@ async function getStravaActivity(accessToken: string, activityId: string) {
   }
 
   return await response.json();
-}
-
-async function getWeatherData(startDate: string, lat: number, lon: number, timezone: string) {
-  const formattedDate = new Date(startDate).toISOString().split('T')[0];
-
-  // Extract the timezone part after the last space
-  const extractedTimezone = timezone.split(" ").pop();
-
-  if (!extractedTimezone) {
-    throw new Error("Timezone format is incorrect");
-  }
-
-  const encodedTimezone = encodeURIComponent(extractedTimezone);
-
-  const response = await fetch(
-    `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${formattedDate}&end_date=${formattedDate}&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,rain_sum,snowfall_sum,wind_speed_10m_max&timezone=${encodedTimezone}`
-  );
-
-  if (!response.ok) {
-    console.log(`Failed to fetch weather data`);
-    
-  }
-
-  const weatherData = await response.json();
-
-  return weatherData.daily || null;
 }

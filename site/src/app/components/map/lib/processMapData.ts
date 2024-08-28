@@ -18,7 +18,8 @@ export const processMapData = (
   isOwner?: boolean
 ) => {
   let lastCoords: any = [];
-
+  let weatherToGet: any = [];
+  const useSegments = activitiesData.length < 50;
   const activities = activitiesData.map((activity: Activity) => {
     const polyline = activity.activity_data?.map?.summary_polyline || "";
     const distance = activity.activity_data?.distance;
@@ -30,9 +31,23 @@ export const processMapData = (
     const avgTemp = activity.weather?.temperature_2m_mean?.[0];
     const rainSum = activity.weather?.rain_sum?.[0];
     const windSpeed = activity.weather?.wind_speed_10m_max?.[0];
+    const shouldHaveWeatherData =
+      activity.activity_data.start_latlng[0] &&
+      activity.activity_data.start_latlng[1] &&
+      activity.activity_data.timezone &&
+      activity.activity_data.start_date
+        ? true
+        : false;
     // Extract last coordinates
     lastCoords = activity.activity_data?.end_latlng || [];
 
+    if (!shouldHaveWeatherData) {
+      console.warn(
+        `Activity ${activity.activity_id} does not have the required data to fetch weather`
+      );
+    } else if (!activity.weather) {
+      weatherToGet.push(activity.activity_id);
+    }
     const returnObject = {
       activityId: activity.activity_id,
       polyline,
@@ -45,7 +60,14 @@ export const processMapData = (
       avgTemp,
       rainSum,
       windSpeed,
-      // segments: activity.activity_detail,
+      weatherStatus: {
+        shouldHaveWeatherData,
+        doesHaveWeatherData: activity.weather ? true : false,
+      },
+      segments:
+        useSegments && activity.activity_detail
+          ? activity.activity_detail
+          : null,
     };
     return returnObject;
   });
@@ -169,6 +191,10 @@ export const processMapData = (
     ],
   };
 
+  const activitiesWithSegmentsCount = activities.filter(
+    (activity: any) => activity.segments
+  ).length;
+
   const standardObject = {
     totalActivities: activities.length,
     totalDistance,
@@ -192,6 +218,9 @@ export const processMapData = (
       ...standardObject,
       mapData,
       activitiesData,
+      weatherToGet,
+      activityIds: activities.map((activity: any) => activity.activityId),
+      activitiesWithSegmentsCount,
     };
   }
 

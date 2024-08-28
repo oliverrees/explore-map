@@ -65,10 +65,15 @@ export default async function Page({
 
       if (mapError) throw new Error(mapError.message);
 
+      const dataToGet =
+        mapData.map_activities.length < 50
+          ? "weather, photos, activity_id, activity_data, activity_detail"
+          : "weather, photos, activity_id, activity_data";
+
       // Fetch the activities details from the exploremap_activities table
       const { data: activitiesData, error: activitiesError } = await supabase
         .from("exploremap_activities")
-        .select("weather, photos, activity_id, activity_data")
+        .select(dataToGet)
         .order("activity_id", { ascending: false })
         .in("activity_id", mapData.map_activities);
 

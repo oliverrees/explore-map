@@ -10,6 +10,8 @@ interface Props {
   showPins: boolean;
   showSatellite: boolean;
   onChangeShowSatellite: (satelliteStatus: boolean) => void;
+  dark: boolean;
+  onChangeDark: (darkStatus: boolean) => void;
 }
 
 function classNames(...classes: any[]) {
@@ -24,6 +26,8 @@ const StatsTable = ({
   showPins,
   onChangeShowSatellite,
   showSatellite,
+  dark,
+  onChangeDark,
 }: Props) => {
   const [miles, setMiles] = useState(false);
   const [expandStats, setExpandStats] = useState(false);
@@ -48,84 +52,117 @@ const StatsTable = ({
   ];
 
   return (
-    <div className="bg-white py-0.5 md:py-0">
-      <table className="w-full divide-y divide-gray-300 lg:flex ">
-        <tbody className="divide-y divide-gray-200 w-full">
-          {stats.map((stat) => (
-            <tr
-              key={stat.label}
-              className={classNames(
-                !expandStats && !stat.alwaysShow && "hidden",
-                "flex justify-between "
-              )}
-            >
-              <td className="px-4 py-3 text-xs md:text-sm font-medium text-gray-900 capitalize">
-                {stat.label}
-              </td>
-              <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
-                {miles ? stat.value.miles : stat.value.km}
-                &nbsp;
-                {miles
-                  ? stat.label == "Total elevation"
-                    ? "ft"
-                    : "miles"
-                  : stat.label == "Total elevation"
-                  ? "m"
-                  : "km"}
-              </td>
-            </tr>
-          ))}
-          {expandStats && (
-            <>
-              <tr className="flex justify-between">
-                <td className="px-4 py-3 text-xs md:text-sm font-medium text-gray-900">
-                  Total Time (hrs)
+    <div
+      className={`${
+        dark ? "bg-black text-white" : "bg-gray-50 text-gray-500"
+      } py-0.5 md:py-0`}
+    >
+      <div
+        style={{
+          display: expandStats ? "block" : "none",
+        }}
+      >
+        <table className="w-full divide-y divide-gray-300 lg:flex ">
+          <tbody className="divide-y divide-gray-200 w-full">
+            {stats.map((stat) => (
+              <tr
+                key={stat.label}
+                className={classNames(
+                  !expandStats && !stat.alwaysShow && "hidden",
+                  "flex justify-between "
+                )}
+              >
+                <td className="px-4 py-3 text-xs md:text-sm font-medium capitalize">
+                  {stat.label}
                 </td>
-                <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
-                  {secondsToHours(data.totalTime)}
+                <td className="px-4 py-3 text-xs md:text-sm ">
+                  {miles ? stat.value.miles : stat.value.km}
+                  &nbsp;
+                  {miles
+                    ? stat.label == "Total elevation"
+                      ? "ft"
+                      : "miles"
+                    : stat.label == "Total elevation"
+                    ? "m"
+                    : "km"}
                 </td>
               </tr>
-              <tr className="flex justify-between">
-                <td className="px-4 py-3 text-xs md:text-sm font-medium text-gray-900">
-                  Total Activities
-                </td>
-                <td className="px-4 py-3 text-xs md:text-sm text-gray-500">
-                  {data.totalActivities}
-                </td>
-              </tr>
-            </>
-          )}
-        </tbody>
-      </table>
+            ))}
+            {expandStats && (
+              <>
+                <tr className="flex justify-between">
+                  <td className="px-4 py-3 text-xs md:text-sm font-medium">
+                    Total Time (hrs)
+                  </td>
+                  <td className="px-4 py-3 text-xs md:text-sm ">
+                    {secondsToHours(data.totalTime)}
+                  </td>
+                </tr>
+                <tr className="flex justify-between">
+                  <td className="px-4 py-3 text-xs md:text-sm font-medium ">
+                    Total Activities
+                  </td>
+                  <td className="px-4 py-3 text-xs md:text-sm ">
+                    {data.totalActivities}
+                  </td>
+                </tr>
+              </>
+            )}
+          </tbody>
+        </table>
+        <div
+          style={{ pointerEvents: "all" }}
+          className={`flex w-full text-xs items-center justify-center flex-col gap-2  p-4 font-semibold 
+            ${dark ? "bg-white/10 text-white" : "bg-gray-100 text-black"}`}
+        >
+          <div>
+            <UnitSwitch
+              checkedStatus={miles}
+              setCheckedStatus={setMiles}
+              dark={dark}
+            />
+          </div>
+          <div>KM/Miles</div>
+        </div>
+      </div>
       <div
         style={{ pointerEvents: "all" }}
-        className="py-2 pt-3 md:py-4 items-center bg-gray-50 justify-center gap-y-2 text-center text-xs md:text-sm font-semibold grid grid-cols-4 px-4"
+        className={`py-2 pt-3 md:py-4 items-center ${
+          dark ? "bg-black text-white" : "bg-gray-50 text-black"
+        } justify-center gap-y-2 text-center text-xs md:text-sm font-semibold grid grid-cols-4 px-4`}
       >
         <div>
           <UnitSwitch
             checkedStatus={expandStats}
             setCheckedStatus={setExpandStats}
+            dark={dark}
           />
         </div>
         <div>
           <UnitSwitch
             checkedStatus={showSatellite}
             setCheckedStatus={onChangeShowSatellite}
+            dark={dark}
           />
         </div>
         <div>
           <UnitSwitch
             checkedStatus={showPins}
             setCheckedStatus={onChangeShowPins}
+            dark={dark}
           />
         </div>
         <div>
-          <UnitSwitch checkedStatus={miles} setCheckedStatus={setMiles} />
+          <UnitSwitch
+            checkedStatus={dark}
+            setCheckedStatus={onChangeDark}
+            dark={dark}
+          />
         </div>
         <div>Stats</div>
         <div>Satellite</div>
         <div>Pins</div>
-        <div>KM/Miles</div>
+        <div>Dark</div>
       </div>
     </div>
   );
@@ -134,16 +171,21 @@ const StatsTable = ({
 interface UnitSwitchProps {
   checkedStatus: boolean;
   setCheckedStatus: any;
+  dark: boolean;
 }
 
-const UnitSwitch = ({ checkedStatus, setCheckedStatus }: UnitSwitchProps) => {
+const UnitSwitch = ({
+  checkedStatus,
+  setCheckedStatus,
+  dark,
+}: UnitSwitchProps) => {
   return (
     <Switch
       checked={checkedStatus}
       onChange={setCheckedStatus}
-      className={classNames(
-        "bg-gray-200 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-      )}
+      className={`
+        relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none
+        ${dark ? "bg-white/20" : "bg-gray-200"}`}
     >
       <span className="sr-only">Use setting</span>
       <span

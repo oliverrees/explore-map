@@ -22,7 +22,7 @@ export default function MapPage() {
     <>
       <MapStats data={data} />
       <div className="h-full pb-[4.5rem] relative lg:pb-0">
-        <Map data={data} isPublic={false} useSegments={false} />
+        <Map data={data} isPublic={false} />
       </div>
     </>
   );

@@ -1,17 +1,18 @@
 import { Select, SelectItem } from "@nextui-org/react";
-import React from "react";
+import React, { SetStateAction } from "react";
 import { getColorFromValue } from "./lib/getColorFromValue";
 
 type Props = {
-  selectedLayer: string;
-  setSelectedLayer: (layer: string) => void;
+  selectedLayer: any;
+  setSelectedLayer: any;
   minMaxValues: Record<string, [number, number]>;
+  dark?: boolean;
 };
-
 export const Layers = ({
   selectedLayer,
   setSelectedLayer,
   minMaxValues,
+  dark,
 }: Props) => {
   const layers = [
     { key: "averageSpeed", label: "Avg Speed", unit: "km/h" },
@@ -23,6 +24,10 @@ export const Layers = ({
     { key: "windSpeed", label: "Wind Speed", unit: "m/s" },
     { key: "None", label: "None", unit: "" },
   ];
+
+  const handleSelectionChange = (e: any) => {
+    setSelectedLayer(e.target.value);
+  };
 
   const minValue = minMaxValues[selectedLayer]?.[0] ?? null;
   const maxValue = minMaxValues[selectedLayer]?.[1] ?? null;
@@ -38,7 +43,11 @@ export const Layers = ({
 
   return (
     <>
-      <div className="absolute top-3.5 z-50 left-16 right-5 h-14 lg:right-0 lg:left-0 flex justify-center pointer-events-none">
+      <div
+        className={`absolute top-3.5 z-50 left-16 right-5 h-14 lg:right-0 lg:left-0 flex justify-center pointer-events-none ${
+          dark ? "dark" : ""
+        }`}
+      >
         <div className="pointer-events-auto w-full max-w-lg flex gap-4">
           <Select
             label="Colour Layer"
@@ -46,13 +55,11 @@ export const Layers = ({
             className="max-w-xs mb-2 shadow-lg"
             classNames={{
               label: "text-sm font-medium text-gray-900",
-              trigger: "bg-gray-50",
+              trigger: dark ? "" : "bg-gray-50",
             }}
             value={selectedLayer}
             selectedKeys={[selectedLayer]}
-            onChange={(e) => {
-              setSelectedLayer(e.target.value);
-            }}
+            onChange={handleSelectionChange}
           >
             {filteredLayers.map((layer) => (
               <SelectItem key={layer.key} value={layer.key}>
@@ -62,9 +69,13 @@ export const Layers = ({
           </Select>
 
           {selectedLayer != "None" && (
-            <div className="shadow-lg w-full bg-gray-50 rounded-xl p-2">
-              <div className="flex justify-between text-xs text-gray-600 items-center mt-0.5">
-                <span>{minValue.toFixed(2)}</span>
+            <div
+              className={`shadow-lg w-full ${
+                dark ? "bg-default-100 text-white" : "bg-gray-50 text-gray-600"
+              } rounded-xl p-2`}
+            >
+              <div className="flex justify-between text-xs  items-center mt-0.5">
+                <span>{minValue?.toFixed(2)}</span>
                 <span>
                   {layers.find((layer) => layer.key === selectedLayer)?.unit}
                 </span>

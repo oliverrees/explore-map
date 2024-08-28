@@ -18,10 +18,10 @@ export default function MapPage() {
     data.mapData.zoom_level ?? 0
   );
   const [centerLat, setCenterLat] = useState<string>(
-    data.mapData?.center_lat_lng?.[0] ?? 0
+    data.mapData?.center_lat_lng?.[0] ?? null
   );
   const [centerLon, setCenterLon] = useState<string>(
-    data.mapData?.center_lat_lng?.[1] ?? 0
+    data.mapData?.center_lat_lng?.[1] ?? null
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -31,7 +31,10 @@ export default function MapPage() {
   const saveSettings = async () => {
     const { data: mapData, error: mapError } = await supabase
       .from("exploremap_maps")
-      .update({ zoom_level: zoomLevel, center_lat_lng: [centerLat, centerLon] })
+      .update({
+        zoom_level: zoomLevel,
+        center_lat_lng: centerLat && centerLon ? [centerLat, centerLon] : null,
+      })
       .eq("id", data.mapData.id)
       .select("slug")
       .single();
