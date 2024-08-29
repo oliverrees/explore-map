@@ -11,9 +11,10 @@ import ActivityPolyline from "./ActivityPolyline";
 type Props = {
   data: any;
   isPublic: boolean;
+  isScreenshot?: boolean;
 };
 
-const Map = ({ data, isPublic }: Props) => {
+const Map = ({ data, isPublic, isScreenshot }: Props) => {
   const [showPins, setShowPins] = useState(true);
   const [open, setOpen] = useState(false);
   const [activityId, setActivityId] = useState(0);
@@ -39,31 +40,41 @@ const Map = ({ data, isPublic }: Props) => {
 
   const tileUrl = showSatellite
     ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-    : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+    : "http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}";
+
+  // https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png
 
   return (
-    <div className={`w-full h-full ${dark ? "map-dark" : "not-dark"}`}>
-      <Stats
-        data={data}
-        showPins={showPins}
-        showSatellite={showSatellite}
-        onChangeShowPins={setShowPins}
-        onChangeShowSatellite={setShowSatellite}
-        dark={dark}
-        onChangeDark={setShowDark}
-      />
-      <Layers
-        selectedLayer={selectedLayer}
-        setSelectedLayer={setSelectedLayer}
-        minMaxValues={data.minMaxValues}
-      />
+    <div
+      className={`w-full h-full page-loaded ${dark ? "map-dark" : "not-dark"}`}
+    >
+      {!isScreenshot && (
+        <>
+          <Stats
+            data={data}
+            showPins={showPins}
+            showSatellite={showSatellite}
+            onChangeShowPins={setShowPins}
+            onChangeShowSatellite={setShowSatellite}
+            dark={dark}
+            onChangeDark={setShowDark}
+          />
+          <Layers
+            selectedLayer={selectedLayer}
+            setSelectedLayer={setSelectedLayer}
+            minMaxValues={data.minMaxValues}
+          />
+        </>
+      )}
       <div className="w-full h-full relative z-0">
-        <Sidebar
-          open={open}
-          onClose={() => setOpen(false)}
-          activityId={activityId}
-          mapId={data.mapId}
-        />
+        {!isScreenshot && (
+          <Sidebar
+            open={open}
+            onClose={() => setOpen(false)}
+            activityId={activityId}
+            mapId={data.mapId}
+          />
+        )}
         <MapContainer
           center={data.centerCoords}
           zoom={data.zoomLevel}
@@ -71,11 +82,9 @@ const Map = ({ data, isPublic }: Props) => {
           minZoom={1}
           className="w-full h-full"
           scrollWheelZoom={true}
+          zoomControl={!isScreenshot}
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url={tileUrl}
-          />
+          <TileLayer attribution="Powered by Esri" url={tileUrl} />
           {data.activities.map((activity: any, i: number) => (
             <ActivityPolyline
               key={i}

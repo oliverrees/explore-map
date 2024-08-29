@@ -14,9 +14,10 @@ const Map = dynamic(() => import("../../../components/map/Map"), {
 
 interface MapHolderProps {
   data: any;
+  isScreenshot?: boolean;
 }
 
-export const MapHolder = ({ data }: MapHolderProps) => {
+export const MapHolder = ({ data, isScreenshot }: MapHolderProps) => {
   const [height, setHeight] = useState(0);
   useEffect(() => {
     const height = document.documentElement?.clientHeight;
@@ -29,7 +30,7 @@ export const MapHolder = ({ data }: MapHolderProps) => {
         height: `${height}px`,
       }}
     >
-      <Map data={data} isPublic={true} />
+      <Map data={data} isPublic={true} isScreenshot={isScreenshot} />
     </div>
   );
 };

@@ -23,6 +23,14 @@ export default function MapPage() {
     if (mapError) {
       console.error(mapError);
     } else {
+      if (enabled === true) {
+        const { data: stravaData, error: stravaError } =
+          await supabase.functions.invoke("fetch-screenshot", {
+            body: {
+              map_id: data.mapData.map_id,
+            },
+          });
+      }
     }
   };
 

@@ -16,31 +16,52 @@ export async function generateMetadata({
       title: "Map not found",
     };
   }
-  const fetchMapTitle = async () => {
+
+  const fetchMapDetails = async () => {
     try {
       const { data: mapData, error: mapError } = await supabase
         .from("exploremap_maps")
-        .select("map_name")
+        .select("map_name, screenshot_url")
         .eq("slug", mapSlug)
         .eq("is_shared", true)
         .single();
       if (mapError) throw new Error(mapError.message);
-      return mapData.map_name;
+      return mapData;
     } catch (error) {
       console.error("Error loading map data:", error);
     }
   };
-  const title = await fetchMapTitle();
+
+  const mapDetails = await fetchMapDetails();
   return {
-    title,
+    title: mapDetails?.map_name || "Map not found",
+    image: mapDetails?.screenshot_url || "",
+    openGraph: {
+      title: mapDetails?.map_name || "Map not found",
+      description: mapDetails?.map_name + " - Map shared by ExploreMap",
+      url: "https://exploremap.io",
+      siteName: "ExploreMap",
+      images: [
+        {
+          url: mapDetails?.screenshot_url || "",
+          width: 1200,
+          height: 900,
+        },
+      ],
+      locale: "en_GB",
+      type: "website",
+    },
   };
 }
 
 export default async function Page({
+  searchParams,
   params,
 }: {
   params: { mapSlug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const isScreenshot = searchParams.screenshot === "true";
   const mapSlug = params.mapSlug;
   if (!mapSlug) {
     return (
@@ -91,5 +112,5 @@ export default async function Page({
     return <EmptyScreen text="Map not found" />;
   }
 
-  return <MapHolder data={mapData} />;
+  return <MapHolder data={mapData} isScreenshot={isScreenshot} />;
 }
