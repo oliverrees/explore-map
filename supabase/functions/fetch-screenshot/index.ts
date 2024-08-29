@@ -8,7 +8,7 @@ const supabase = createClient(
 
 serve(async (req) => {
   const corsHeaders = {
-    "Access-Control-Allow-Origin": "",
+    "Access-Control-Allow-Origin": "*", // Adjust as needed
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
     "Access-Control-Max-Age": "86400",
@@ -56,15 +56,13 @@ serve(async (req) => {
     }
 
     const { slug } = mapData;
-    const url = `https://exploremap.io/map/${slug}?screenshot=true`; // Adjust URL as needed
+    const url = `https://exploremap.io/map/${slug}?screenshot=true`;
 
-    // POST request to /api/screenshot endpoint
-    const screenshotResponse = await fetch("https://exploremap.io/api/screenshot", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ url }),
+    // GET request to Screenshot Machine API
+    const screenshotResponse = await fetch(`https://api.screenshotmachine.com/?key=da4c24&url=${
+      encodeURIComponent(url)
+    }&dimension=1200x650&cacheLimit=1&delay=1000&crop=0%2C0%2C1200%2C620`, {
+      method: "GET",
     });
 
     if (!screenshotResponse.ok) {
@@ -74,11 +72,11 @@ serve(async (req) => {
     const screenshotBuffer = await screenshotResponse.arrayBuffer();
 
     // Save the screenshot to Supabase Storage
-    const fileName = `screenshots/${map_id}_${Date.now()}.png`;
+    const fileName = `screenshots/${map_id}_${Date.now()}.jpg`;
     const { data, error: uploadError } = await supabase.storage
-      .from("exploremap_screenshots") // Bucket name
+      .from("exploremap_screenshots")
       .upload(fileName, new Uint8Array(screenshotBuffer), {
-        contentType: "image/png",
+        contentType: "image/jpg",
         upsert: true,
       });
 
@@ -86,46 +84,58 @@ serve(async (req) => {
       throw new Error(`Supabase upload error: ${uploadError.message}`);
     }
 
-    const publicUrl = supabase.storage
-      .from("exploremap_screenshots") // Bucket name
-      .getPublicUrl(fileName).data.publicUrl;
+    const { data: publicURLData, error: publicUrlError } = supabase.storage
+      .from("exploremap_screenshots")
+      .getPublicUrl(fileName);
+
+      const publicURL = publicURLData?.publicUrl;
+
+      console.log("Getting public URL", publicURL);
+      console.log("For file name", fileName);
+
+    if (publicUrlError) {
+      throw new Error(`Supabase get public URL error: ${publicUrlError.message}`);
+    }
+
+        // Clean up old screenshots (if any)
+        const { data: oldScreenshots, error: oldScreenshotsError } = await supabase
+        .from("exploremap_maps")
+        .select("screenshot_url")
+        .eq("map_id", map_id)
+        .single();
+  
+      if (oldScreenshotsError) {
+        throw new Error(`Supabase fetch old screenshots error: ${oldScreenshotsError.message}`);
+      }
 
     // Update the map record with the new screenshot URL
     const { error: updateError } = await supabase
       .from("exploremap_maps")
-      .update({ screenshot_url: publicUrl })
+      .update({ screenshot_url: publicURL })
       .eq("map_id", map_id);
+
+      console.log('publicURL', publicURL);
 
     if (updateError) {
       throw new Error(`Supabase update error: ${updateError.message}`);
-    }
-
-    // Clean up old screenshots (if any)
-    const { data: oldScreenshots, error: oldScreenshotsError } = await supabase
-      .from("exploremap_maps")
-      .select("screenshot_url")
-      .eq("map_id", map_id)
-      .single();
-
-    if (oldScreenshotsError) {
-      throw new Error(`Supabase fetch old screenshots error: ${oldScreenshotsError.message}`);
     }
 
     if (oldScreenshots?.screenshot_url) {
       const oldFileName = oldScreenshots.screenshot_url.split('/').pop();
       if (oldFileName) {
         const { error: deleteError } = await supabase.storage
-          .from("exploremap_screenshots") // Bucket name
+          .from("exploremap_screenshots")
           .remove([oldFileName]);
 
         if (deleteError) {
           throw new Error(`Supabase delete error: ${deleteError.message}`);
         }
       }
+
     }
 
     return new Response(
-      JSON.stringify({ success: true, screenshot_url: publicUrl }),
+      JSON.stringify({ success: true, screenshot_url: publicURL }),
       { status: 200, headers: corsHeaders }
     );
   } catch (error) {

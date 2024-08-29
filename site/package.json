@@ -14,7 +14,6 @@
     "@internationalized/date": "^3.5.5",
     "@mapbox/polyline": "^1.2.1",
     "@nextui-org/react": "^2.4.6",
-    "@sparticuz/chromium": "^127.0.0",
     "@splidejs/react-splide": "^0.7.12",
     "@supabase/ssr": "^0.4.0",
     "@supabase/supabase-js": "^2.45.1",

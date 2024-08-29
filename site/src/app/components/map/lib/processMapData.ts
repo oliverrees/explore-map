@@ -42,9 +42,9 @@ export const processMapData = (
     lastCoords = activity.activity_data?.end_latlng || [];
 
     if (!shouldHaveWeatherData) {
-      console.warn(
-        `Activity ${activity.activity_id} does not have the required data to fetch weather`
-      );
+      // console.warn(
+      //   `Activity ${activity.activity_id} does not have the required data to fetch weather`
+      // );
     } else if (!activity.weather) {
       weatherToGet.push(activity.activity_id);
     }

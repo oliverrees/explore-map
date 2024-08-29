@@ -38,7 +38,7 @@ export async function generateMetadata({
     image: mapDetails?.screenshot_url || "",
     openGraph: {
       title: mapDetails?.map_name || "Map not found",
-      description: mapDetails?.map_name + " - Map shared by ExploreMap",
+      description: `View the map ${mapDetails?.map_name} on ExploreMap`,
       url: "https://exploremap.io",
       siteName: "ExploreMap",
       images: [

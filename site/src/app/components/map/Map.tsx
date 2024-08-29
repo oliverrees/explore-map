@@ -7,6 +7,10 @@ import { WaitingForDataScreen } from "./WaitingForDataScreen";
 import { WaitingForData } from "./WaitingForData";
 import { Layers } from "./Layers";
 import ActivityPolyline from "./ActivityPolyline";
+import { ExploreBadge } from "./ExploreBadge";
+import StatsTable from "./StatsTable";
+import Image from "next/image";
+import logo from "../../assets/img/logoTrans.png";
 
 type Props = {
   data: any;
@@ -14,7 +18,7 @@ type Props = {
   isScreenshot?: boolean;
 };
 
-const Map = ({ data, isPublic, isScreenshot }: Props) => {
+const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
   const [showPins, setShowPins] = useState(true);
   const [open, setOpen] = useState(false);
   const [activityId, setActivityId] = useState(0);
@@ -46,41 +50,45 @@ const Map = ({ data, isPublic, isScreenshot }: Props) => {
 
   return (
     <div
-      className={`w-full h-full page-loaded ${dark ? "map-dark" : "not-dark"}`}
+      className={`w-full h-full flex flex-col ${
+        dark ? "map-dark" : "not-dark"
+      }`}
     >
-      {!isScreenshot && (
-        <>
-          <Stats
-            data={data}
-            showPins={showPins}
-            showSatellite={showSatellite}
-            onChangeShowPins={setShowPins}
-            onChangeShowSatellite={setShowSatellite}
-            dark={dark}
-            onChangeDark={setShowDark}
-          />
-          <Layers
-            selectedLayer={selectedLayer}
-            setSelectedLayer={setSelectedLayer}
-            minMaxValues={data.minMaxValues}
-          />
-        </>
+      {!isScreenshot ? (
+        <ExploreBadge
+          isScreenshot={isScreenshot}
+          isPublic={isPublic}
+          dark={dark}
+        />
+      ) : (
+        <Image
+          src={logo}
+          alt="logo"
+          className="fixed top-12 right-12 w-24 z-50 bg-gray-50 px-2 py-1 rounded-lg shadow-lg"
+        />
       )}
-      <div className="w-full h-full relative z-0">
+      <div className="h-full w-full relative">
         {!isScreenshot && (
-          <Sidebar
-            open={open}
-            onClose={() => setOpen(false)}
-            activityId={activityId}
-            mapId={data.mapId}
-          />
+          <>
+            <Layers
+              selectedLayer={selectedLayer}
+              setSelectedLayer={setSelectedLayer}
+              minMaxValues={data.minMaxValues}
+            />
+            <Sidebar
+              open={open}
+              onClose={() => setOpen(false)}
+              activityId={activityId}
+              mapId={data.mapId}
+            />
+          </>
         )}
         <MapContainer
           center={data.centerCoords}
           zoom={data.zoomLevel}
           maxZoom={20}
           minZoom={1}
-          className="w-full h-full"
+          className="w-full h-full z-0 relative"
           scrollWheelZoom={true}
           zoomControl={!isScreenshot}
         >
@@ -99,7 +107,27 @@ const Map = ({ data, isPublic, isScreenshot }: Props) => {
             />
           ))}
         </MapContainer>
+        <div
+          className={`absolute bottom-0 left-0 w-full z-50 flex justify-between flex-col items-start lg:w-auto ${
+            isScreenshot ? "ml-8 mb-12 scale-125" : " "
+          }`}
+        >
+          <Stats data={data} showSatellite={showSatellite} dark={dark} />
+        </div>
       </div>
+      {!isScreenshot && (
+        <div className="lg:fixed bottom-0 md:bottom-10 left-0 right-0 md:right-10 md:left-auto">
+          <StatsTable
+            data={data}
+            showPins={showPins}
+            onChangeShowPins={setShowPins}
+            showSatellite={showSatellite}
+            onChangeShowSatellite={setShowSatellite}
+            dark={dark}
+            onChangeDark={setShowDark}
+          />
+        </div>
+      )}
     </div>
   );
 };

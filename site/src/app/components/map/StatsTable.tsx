@@ -54,16 +54,16 @@ const StatsTable = ({
   return (
     <div
       className={`${
-        dark ? "bg-black text-white" : "bg-gray-50 text-gray-500"
-      } py-0.5 md:py-0`}
+        dark ? "bg-black text-white" : "bg-gray-50 lg:bg-white text-gray-500"
+      } lg:pb-2 lg:pt-3 lg:px-4 pt-1 lg:rounded-lg lg:shadow-lg`}
     >
       <div
         style={{
           display: expandStats ? "block" : "none",
         }}
       >
-        <table className="w-full divide-y divide-gray-300 lg:flex ">
-          <tbody className="divide-y divide-gray-200 w-full">
+        <table className="w-full divide-y divide-gray-300 lg:flex">
+          <tbody className="divide-y divide-gray-200 w-full lg:pb-3">
             {stats.map((stat) => (
               <tr
                 key={stat.label}
@@ -112,9 +112,14 @@ const StatsTable = ({
         </table>
         <div
           style={{ pointerEvents: "all" }}
-          className={`flex w-full text-xs items-center justify-center flex-col gap-2  p-4 font-semibold 
-            ${dark ? "bg-white/10 text-white" : "bg-gray-100 text-black"}`}
+          className={`flex text-xs items-center lg:rounded-lg gap-2 justify-between px-4 lg:px-2 p-2 mt-2 lg:mt-0 lg:mx-2 mb-2 font-semibold 
+            ${
+              dark
+                ? "bg-white/10 text-white"
+                : "bg-gray-100 lg:bg-white text-black"
+            }`}
         >
+          <div>KM/Miles</div>
           <div>
             <UnitSwitch
               checkedStatus={miles}
@@ -122,14 +127,13 @@ const StatsTable = ({
               dark={dark}
             />
           </div>
-          <div>KM/Miles</div>
         </div>
       </div>
       <div
         style={{ pointerEvents: "all" }}
         className={`py-2 pt-3 md:py-4 items-center ${
-          dark ? "bg-black text-white" : "bg-gray-50 text-black"
-        } justify-center gap-y-2 text-center text-xs md:text-sm font-semibold grid grid-cols-4 px-4`}
+          dark ? "bg-black text-white" : "bg-gray-50 lg:bg-white text-black"
+        } justify-center gap-y-2 text-center text-xs md:text-sm font-semibold grid grid-cols-4 px-4 lg:gap-x-4`}
       >
         <div>
           <UnitSwitch
