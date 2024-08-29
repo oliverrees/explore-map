@@ -1,11 +1,8 @@
 // app/api/screenshot/route.ts
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer-core";
-import edgeChromium from "chrome-aws-lambda";
 import sharp from "sharp";
-
-const LOCAL_CHROME_EXECUTABLE =
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+import chromium from "@sparticuz/chromium";
 
 export async function POST(request: Request) {
   try {
@@ -15,14 +12,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Launch Puppeteer
-    const executablePath =
-      (await edgeChromium.executablePath) || LOCAL_CHROME_EXECUTABLE;
-
     const browser = await puppeteer.launch({
-      executablePath,
-      args: edgeChromium.args,
-      headless: true,
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     });
     const page = await browser.newPage();
 
