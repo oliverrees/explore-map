@@ -59,14 +59,19 @@ serve(async (req) => {
     const url = `https://exploremap.io/map/${slug}?screenshot=true`;
 
     // GET request to Screenshot Machine API
-    const screenshotResponse = await fetch(`https://api.screenshotmachine.com/?key=da4c24&url=${
-      encodeURIComponent(url)
-    }&dimension=1200x650&cacheLimit=0&delay=1000&crop=0%2C0%2C1200%2C620`, {
-      method: "GET",
-    });
+    const screenshotResponse = await fetch(
+      `https://api.screenshotmachine.com/?key=da4c24&url=${encodeURIComponent(
+        url
+      )}&dimension=1200x650&cacheLimit=10&delay=1000&crop=0%2C0%2C1200%2C620`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!screenshotResponse.ok) {
-      throw new Error(`Failed to take screenshot: ${await screenshotResponse.text()}`);
+      throw new Error(
+        `Failed to take screenshot: ${await screenshotResponse.text()}`
+      );
     }
 
     const screenshotBuffer = await screenshotResponse.arrayBuffer();
@@ -88,25 +93,29 @@ serve(async (req) => {
       .from("exploremap_screenshots")
       .getPublicUrl(fileName);
 
-      const publicURL = publicURLData?.publicUrl;
+    const publicURL = publicURLData?.publicUrl;
 
-      console.log("Getting public URL", publicURL);
-      console.log("For file name", fileName);
+    console.log("Getting public URL", publicURL);
+    console.log("For file name", fileName);
 
     if (publicUrlError) {
-      throw new Error(`Supabase get public URL error: ${publicUrlError.message}`);
+      throw new Error(
+        `Supabase get public URL error: ${publicUrlError.message}`
+      );
     }
 
-        // Clean up old screenshots (if any)
-        const { data: oldScreenshots, error: oldScreenshotsError } = await supabase
-        .from("exploremap_maps")
-        .select("screenshot_url")
-        .eq("map_id", map_id)
-        .single();
-  
-      if (oldScreenshotsError) {
-        throw new Error(`Supabase fetch old screenshots error: ${oldScreenshotsError.message}`);
-      }
+    // Clean up old screenshots (if any)
+    const { data: oldScreenshots, error: oldScreenshotsError } = await supabase
+      .from("exploremap_maps")
+      .select("screenshot_url")
+      .eq("map_id", map_id)
+      .single();
+
+    if (oldScreenshotsError) {
+      throw new Error(
+        `Supabase fetch old screenshots error: ${oldScreenshotsError.message}`
+      );
+    }
 
     // Update the map record with the new screenshot URL
     const { error: updateError } = await supabase
@@ -114,14 +123,14 @@ serve(async (req) => {
       .update({ screenshot_url: publicURL })
       .eq("map_id", map_id);
 
-      console.log('publicURL', publicURL);
+    console.log("publicURL", publicURL);
 
     if (updateError) {
       throw new Error(`Supabase update error: ${updateError.message}`);
     }
 
     if (oldScreenshots?.screenshot_url) {
-      const oldFileName = oldScreenshots.screenshot_url.split('/').pop();
+      const oldFileName = oldScreenshots.screenshot_url.split("/").pop();
       if (oldFileName) {
         const { error: deleteError } = await supabase.storage
           .from("exploremap_screenshots")
@@ -131,7 +140,6 @@ serve(async (req) => {
           throw new Error(`Supabase delete error: ${deleteError.message}`);
         }
       }
-
     }
 
     return new Response(

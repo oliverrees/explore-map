@@ -43,12 +43,6 @@ export default function MapPage() {
       setLoading(false);
       console.error(mapError);
     } else {
-      const { data: stravaData, error: stravaError } =
-        await supabase.functions.invoke("fetch-screenshot", {
-          body: {
-            map_id: data.mapData.map_id,
-          },
-        });
       fetchMapData();
       updateMapData(data.slug);
       router.push(`/app/map/${mapData.slug}`);
