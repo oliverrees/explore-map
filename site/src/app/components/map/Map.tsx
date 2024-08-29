@@ -107,13 +107,14 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
             />
           ))}
         </MapContainer>
-        <div
-          className={`absolute bottom-0 left-0 w-full z-50 flex justify-between flex-col items-start lg:w-auto ${
-            isScreenshot ? "ml-8 mb-12 scale-125" : " "
-          }`}
-        >
-          <Stats data={data} showSatellite={showSatellite} dark={dark} />
-        </div>
+        {!isScreenshot && (
+          <div
+            className={`absolute bottom-0 left-0 w-full z-50 flex justify-between flex-col items-start lg:w-auto 
+          `}
+          >
+            <Stats data={data} showSatellite={showSatellite} dark={dark} />
+          </div>
+        )}
       </div>
       {!isScreenshot && (
         <div className="lg:fixed bottom-0 md:bottom-10 left-0 right-0 md:right-10 md:left-auto">
