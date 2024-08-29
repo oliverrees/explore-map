@@ -1,7 +1,11 @@
 // app/api/screenshot/route.ts
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import edgeChromium from "chrome-aws-lambda";
 import sharp from "sharp";
+
+const LOCAL_CHROME_EXECUTABLE =
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +16,14 @@ export async function POST(request: Request) {
     }
 
     // Launch Puppeteer
-    const browser = await puppeteer.launch({ headless: true });
+    const executablePath =
+      (await edgeChromium.executablePath) || LOCAL_CHROME_EXECUTABLE;
+
+    const browser = await puppeteer.launch({
+      executablePath,
+      args: edgeChromium.args,
+      headless: true,
+    });
     const page = await browser.newPage();
 
     // Set the viewport to a 16:9 aspect ratio
