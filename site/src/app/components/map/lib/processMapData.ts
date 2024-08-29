@@ -19,6 +19,7 @@ export const processMapData = (
 ) => {
   let lastCoords: any = [];
   let weatherToGet: any = [];
+
   const useSegments = activitiesData.length < 50;
   const activities = activitiesData.map((activity: Activity) => {
     const polyline = activity.activity_data?.map?.summary_polyline || "";
@@ -113,6 +114,17 @@ export const processMapData = (
     { date: new Date(0), id: 0 }
   );
 
+  const minSegmentElevationGain = Math.min(
+    ...activities
+      .flatMap((a: any) => a.segments?.totalElevationGains ?? [])
+      .filter((v: any) => v != null)
+  );
+  const maxSegmentElevationGain = Math.max(
+    ...activities
+      .flatMap((a: any) => a.segments?.totalElevationGains ?? [])
+      .filter((v: any) => v != null)
+  );
+
   const centerCoords = mapData.center_lat_lng || lastCoords;
 
   // Calculate min and max values
@@ -129,6 +141,7 @@ export const processMapData = (
           .filter((v: any) => v != null)
       ),
     ],
+    segmentElevationGain: [minSegmentElevationGain, maxSegmentElevationGain],
     elevationGain: [
       Math.min(
         ...activities

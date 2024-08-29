@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   try {
     // Create a response object
-    const response = NextResponse.redirect(new URL("/", request.url), 302);
+    const response = NextResponse.redirect(process.env.BASE_URL || "", 302);
 
     // Clear the token cookie by setting it to expire immediately
     response.cookies.set("token", "", { expires: new Date(0) });

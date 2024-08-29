@@ -21,7 +21,7 @@ export const ExploreBadge = ({
       href="/"
       className={`${
         dark ? "bg-black text-white" : "bg-white"
-      } text-xs flex items-center font-light h-auto cursor-pointer p-1 whitespace-nowrap w-full justify-center `}
+      } text-xs flex items-center font-light h-auto cursor-pointer p-1 whitespace-nowrap w-full justify-center outline-none focus:outline-none`}
     >
       <Image src={logo} alt="logo" className="w-4 mr-1.5" />
       Made with{" "}

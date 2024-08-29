@@ -66,7 +66,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     };
 
     getData();
-  }, [supabase]);
+  }, [supabase, fetchMapData]);
 
   if (loading) {
     return <LoadingScreen />;

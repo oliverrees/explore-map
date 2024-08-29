@@ -104,7 +104,10 @@ const ActivityPolyline = ({
             selectedLayer === "windSpeed"
               ? activity[selectedLayer]
               : activity.segments[remapping[selectedLayer]]?.[j];
-          const minMax = data.minMaxValues[selectedLayer];
+          const minMax =
+            selectedLayer === "elevationGain"
+              ? data.minMaxValues["segmentElevationGain"]
+              : data.minMaxValues[selectedLayer];
           const speed = layerData * 3.6;
           const color =
             selectedLayer === "None" || !minMax
