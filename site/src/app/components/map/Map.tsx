@@ -9,8 +9,6 @@ import { Layers } from "./Layers";
 import ActivityPolyline from "./ActivityPolyline";
 import { ExploreBadge } from "./ExploreBadge";
 import StatsTable from "./StatsTable";
-import Image from "next/image";
-import logo from "../../assets/img/logoTrans.png";
 
 type Props = {
   data: any;
@@ -54,17 +52,11 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
         dark ? "map-dark" : "not-dark"
       }`}
     >
-      {!isScreenshot ? (
+      {!isScreenshot && (
         <ExploreBadge
           isScreenshot={isScreenshot}
           isPublic={isPublic}
           dark={dark}
-        />
-      ) : (
-        <Image
-          src={logo}
-          alt="logo"
-          className="fixed top-12 right-12 w-24 z-50 bg-gray-50 px-2 py-1 rounded-lg shadow-lg"
         />
       )}
       <div className="h-full w-full relative">

@@ -61,7 +61,7 @@ serve(async (req) => {
     // GET request to Screenshot Machine API
     const screenshotResponse = await fetch(`https://api.screenshotmachine.com/?key=da4c24&url=${
       encodeURIComponent(url)
-    }&dimension=1200x650&cacheLimit=1&delay=1000&crop=0%2C0%2C1200%2C620`, {
+    }&dimension=1200x650&cacheLimit=0&delay=1000&crop=0%2C0%2C1200%2C620`, {
       method: "GET",
     });
 
