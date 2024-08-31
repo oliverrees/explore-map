@@ -9,7 +9,7 @@ export const processMapData = (
   let weatherToGet: any = [];
 
   const useSegments =
-    activitiesData.length < (process.env.NEXT_SEGMENT_LIMIT || 0);
+    activitiesData.length < (process.env.NEXT_PUBLIC_SEGMENT_LIMIT || 0);
   const activities = activitiesData.map((activity: Activity) => {
     const polyline = activity.activity_data?.map?.summary_polyline || "";
     const distance = activity.activity_data?.distance;
