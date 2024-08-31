@@ -87,7 +87,7 @@ export default async function Page({
       if (mapError) throw new Error(mapError.message);
 
       const dataToGet =
-        mapData.map_activities.length < 50
+        mapData.map_activities.length < (process.env.NEXT_SEGMENT_LIMIT || 0)
           ? "weather, photos, activity_id, activity_data, activity_detail"
           : "weather, photos, activity_id, activity_data";
 

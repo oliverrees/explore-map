@@ -22,10 +22,11 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
   const [activityId, setActivityId] = useState(0);
   const [showSatellite, setShowSatellite] = useState(false);
   const [selectedLayer, setSelectedLayer] = useState("averageSpeed");
-  const [dark, setShowDark] = useState(false);
+  const [dark, setDark] = useState(false);
 
   if (!data) return null;
-  if (data.activities.length === 0)
+
+  if (data.activities.length === 0) {
     return isPublic ? (
       <WaitingForDataScreen />
     ) : (
@@ -33,18 +34,19 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
         <WaitingForData />
       </div>
     );
+  }
 
   if (data.centerCoords.length === 0) {
-    <div className="w-full h-full flex flex-col justify-center items-center gap-4">
-      Error loading GPS data
-    </div>;
+    return (
+      <div className="w-full h-full flex flex-col justify-center items-center gap-4">
+        Error loading GPS data
+      </div>
+    );
   }
 
   const tileUrl = showSatellite
     ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
     : "https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}";
-
-  // https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png
 
   return (
     <div
@@ -65,7 +67,12 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
             <Layers
               selectedLayer={selectedLayer}
               setSelectedLayer={setSelectedLayer}
-              minMaxValues={data.minMaxValues}
+              minMaxValues={
+                data.activitiesWithSegmentsCount > 0
+                  ? data.minMaxSegments
+                  : data.minMaxActivities
+              }
+              isSegments={data.activitiesWithSegmentsCount > 0}
             />
             <Sidebar
               open={open}
@@ -81,7 +88,7 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
           maxZoom={20}
           minZoom={1}
           className="w-full h-full z-0 relative"
-          scrollWheelZoom={true}
+          scrollWheelZoom
           zoomControl={!isScreenshot}
         >
           <TileLayer attribution="Powered by Esri" url={tileUrl} />
@@ -92,18 +99,15 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
               selectedLayer={selectedLayer}
               showPins={showPins}
               data={data}
-              onMarkerClick={(activityId: number) => {
-                setActivityId(activityId);
+              onMarkerClick={(id: number) => {
+                setActivityId(id);
                 setOpen(true);
               }}
             />
           ))}
         </MapContainer>
         {!isScreenshot && (
-          <div
-            className={`absolute bottom-0 left-0 w-full z-50 flex justify-between flex-col items-start lg:w-auto 
-          `}
-          >
+          <div className="absolute bottom-0 left-0 w-full z-50 flex justify-between flex-col items-start lg:w-auto">
             <Stats data={data} showSatellite={showSatellite} dark={dark} />
           </div>
         )}
@@ -117,7 +121,7 @@ const Map = ({ data, isPublic, isScreenshot = false }: Props) => {
             showSatellite={showSatellite}
             onChangeShowSatellite={setShowSatellite}
             dark={dark}
-            onChangeDark={setShowDark}
+            onChangeDark={setDark}
           />
         </div>
       )}

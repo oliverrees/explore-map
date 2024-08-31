@@ -35,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       if (mapError) throw new Error(mapError.message);
 
       const dataToGet =
-        mapData.map_activities.length < 50
+        mapData.map_activities.length < (process.env.NEXT_SEGMENT_LIMIT || 0)
           ? "weather, photos, activity_id, activity_data, activity_detail"
           : "weather, photos, activity_id, activity_data";
 
@@ -64,7 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       // Fetch additional activity data if needed
       if (
-        mapData.map_activities.length < 50 &&
+        mapData.map_activities.length < (process.env.NEXT_SEGMENT_LIMIT || 0) &&
         processedData.activitiesWithSegmentsCount <
           mapData.map_activities.length
       ) {

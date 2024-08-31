@@ -7,12 +7,14 @@ type Props = {
   setSelectedLayer: any;
   minMaxValues: Record<string, [number, number]>;
   dark?: boolean;
+  isSegments?: boolean;
 };
 export const Layers = ({
   selectedLayer,
   setSelectedLayer,
   minMaxValues,
   dark,
+  isSegments,
 }: Props) => {
   const layers = [
     { key: "averageSpeed", label: "Avg Speed", unit: "km/h" },
@@ -29,8 +31,24 @@ export const Layers = ({
     setSelectedLayer(e.target.value);
   };
 
-  const minValue = minMaxValues[selectedLayer]?.[0] ?? null;
-  const maxValue = minMaxValues[selectedLayer]?.[1] ?? null;
+  const remapping: any = {
+    averageSpeed: "averageSpeeds",
+    elevationGain: "totalElevationGains",
+    averageHeartrate: "averageHeartrates",
+    averageCadence: "averageCadence",
+    maxHeartrate: "maxHeartrates",
+    averageWatts: "averageWatts",
+    avgTemp: "avgTemp",
+    rainSum: "rainSum",
+    windSpeed: "windSpeed",
+  };
+
+  const minValue = !isSegments
+    ? minMaxValues[selectedLayer]?.[0] ?? null
+    : minMaxValues[remapping[selectedLayer]]?.[0] ?? null;
+  const maxValue = !isSegments
+    ? minMaxValues[selectedLayer]?.[1] ?? null
+    : minMaxValues[remapping[selectedLayer]]?.[1] ?? null;
 
   const gradientColors = Array.from({ length: 100 }, (_, i) => {
     const value = minValue + (i / 99) * (maxValue - minValue);
@@ -79,7 +97,7 @@ export const Layers = ({
                 <span>
                   {layers.find((layer) => layer.key === selectedLayer)?.unit}
                 </span>
-                <span>{maxValue.toFixed(2)}</span>
+                <span>{maxValue?.toFixed(2)}</span>
               </div>
               <div
                 className="h-4 mt-1 rounded-lg"

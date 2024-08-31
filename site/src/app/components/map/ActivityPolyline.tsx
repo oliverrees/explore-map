@@ -24,7 +24,7 @@ const ActivityPolyline = ({
 
   const maxBlue = 255;
   const minBlue = 50;
-  const stepSize = (maxBlue - minBlue) / (data.activities.length - 1);
+  const stepSize = (maxBlue - minBlue) / data.activities.length;
 
   const i = data.activities.indexOf(activity);
   const shadeOfBlue = Math.round(maxBlue - i * stepSize);
@@ -91,34 +91,41 @@ const ActivityPolyline = ({
 
           // Check if selectedLayer exists in segments and minMaxValues
           const remapping: any = {
-            averageSpeed: "averageSpeeds",
-            elevationGain: "totalElevationGains",
-            averageHeartrate: "averageHeartrates",
-            averageCadence: "averageCadence",
-            maxHeartrate: "maxHeartrates",
+            averageSpeed: activity.segments["averageSpeeds"]?.[j],
+            elevationGain: activity.segments["totalElevationGains"]?.[j],
+            averageHeartrate: activity.segments["averageHeartrates"]?.[j],
+            averageCadence: activity.segments["averageCadence"]?.[j],
+            maxHeartrate: activity.segments["maxHeartrates"]?.[j],
+            averageWatts: activity.segments["averageWatts"]?.[j],
+            avgTemp: activity["avgTemp"],
+            rainSum: activity["rainSum"],
+            windSpeed: activity["windSpeed"],
           };
 
-          const layerData =
-            selectedLayer === "avgTemp" ||
-            selectedLayer === "rainSum" ||
-            selectedLayer === "windSpeed"
-              ? activity[selectedLayer]
-              : activity.segments[remapping[selectedLayer]]?.[j];
-          const minMax =
-            selectedLayer === "elevationGain"
-              ? data.minMaxValues["segmentElevationGain"]
-              : data.minMaxValues[selectedLayer];
-          const speed = layerData * 3.6;
+          const minMaxRemapping: any = {
+            averageSpeed: data.minMaxSegments["averageSpeeds"],
+            elevationGain: data.minMaxSegments["totalElevationGains"],
+            averageHeartrate: data.minMaxSegments["averageHeartrates"],
+            averageCadence: data.minMaxSegments["averageCadence"],
+            maxHeartrate: data.minMaxSegments["maxHeartrates"],
+            averageWatts: data.minMaxSegments["averageWatts"],
+            avgTemp: data.minMaxActivities["avgTemp"],
+            rainSum: data.minMaxActivities["rainSum"],
+            windSpeed: data.minMaxActivities["windSpeed"],
+          };
+
+          const layerData = remapping[selectedLayer];
+          const minMax = minMaxRemapping[selectedLayer];
+
           const color =
-            selectedLayer === "None" || !minMax
+            selectedLayer === "None"
               ? blue
               : getColorFromValue(
-                  selectedLayer === "averageSpeed" ? speed : layerData,
+                  layerData,
                   minMax[0],
                   minMax[1],
                   selectedLayer
                 );
-
           return (
             <div key={`${i}-${j}`}>
               {segmentCoords.length > 1 && (
@@ -145,7 +152,7 @@ const ActivityPolyline = ({
     if (!decodedPolyline) return null;
 
     const layerData = activity[selectedLayer];
-    const minMax = data.minMaxValues[selectedLayer];
+    const minMax = data.minMaxActivities[selectedLayer];
     const color =
       selectedLayer === "None"
         ? blue

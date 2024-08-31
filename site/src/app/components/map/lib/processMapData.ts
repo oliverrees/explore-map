@@ -1,16 +1,4 @@
-interface Activity {
-  activity_data: any;
-  activity_id: number;
-  strava_id: number;
-  weather: any;
-  activity_detail: {
-    distances: number[];
-    average_speeds: number[];
-    max_heartrates: number[];
-    average_heartrates: number[];
-    total_elevation_gains: number[];
-  };
-}
+import { Activity } from "./types/types";
 
 export const processMapData = (
   mapData: any,
@@ -20,7 +8,8 @@ export const processMapData = (
   let lastCoords: any = [];
   let weatherToGet: any = [];
 
-  const useSegments = activitiesData.length < 50;
+  const useSegments =
+    activitiesData.length < (process.env.NEXT_SEGMENT_LIMIT || 0);
   const activities = activitiesData.map((activity: Activity) => {
     const polyline = activity.activity_data?.map?.summary_polyline || "";
     const distance = activity.activity_data?.distance;
@@ -114,21 +103,10 @@ export const processMapData = (
     { date: new Date(0), id: 0 }
   );
 
-  const minSegmentElevationGain = Math.min(
-    ...activities
-      .flatMap((a: any) => a.segments?.totalElevationGains ?? [])
-      .filter((v: any) => v != null)
-  );
-  const maxSegmentElevationGain = Math.max(
-    ...activities
-      .flatMap((a: any) => a.segments?.totalElevationGains ?? [])
-      .filter((v: any) => v != null)
-  );
-
   const centerCoords = mapData.center_lat_lng || lastCoords;
 
   // Calculate min and max values
-  const minMaxValues = {
+  const minMaxActivities = {
     averageSpeed: [
       Math.min(
         ...activities
@@ -141,7 +119,6 @@ export const processMapData = (
           .filter((v: any) => v != null)
       ),
     ],
-    segmentElevationGain: [minSegmentElevationGain, maxSegmentElevationGain],
     elevationGain: [
       Math.min(
         ...activities
@@ -204,6 +181,43 @@ export const processMapData = (
     ],
   };
 
+  let minMaxSegments: any = {
+    averageCadence: [Infinity, 0],
+    averageSpeeds: [Infinity, 0],
+    totalElevationGains: [Infinity, 0],
+    averageHeartrates: [Infinity, 0],
+    maxHeartrates: [Infinity, 0],
+    distances: [Infinity, 0],
+    averageWatts: [Infinity, 0],
+    avgTemp: [minMaxActivities.avgTemp[0], minMaxActivities.avgTemp[1]],
+    rainSum: [minMaxActivities.rainSum[0], minMaxActivities.rainSum[1]],
+    windSpeed: [minMaxActivities.windSpeed[0], minMaxActivities.windSpeed[1]],
+  };
+
+  // Loop through all activity segments and find the minmax values
+  activities.forEach((activity: any) => {
+    if (activity.segments) {
+      // For each segment, loop through all the values and find the minmax
+      Object.keys(activity.segments).forEach((key) => {
+        // Multiply speed by 3.6 to convert m/s to km/h
+        activity.segments[key] = activity.segments[key].map((value: any) =>
+          key === "averageSpeeds" ? value * 3.6 : value
+        );
+        const values = activity?.segments[key];
+        if (values) {
+          const min = Math.min(...values);
+          const max = Math.max(...values);
+          if (minMaxSegments[key][0] > min) {
+            minMaxSegments[key][0] = min;
+          }
+          if (minMaxSegments[key][1] < max) {
+            minMaxSegments[key][1] = max;
+          }
+        }
+      });
+    }
+  });
+
   const activitiesWithSegmentsCount = activities.filter(
     (activity: any) => activity.segments
   ).length;
@@ -223,7 +237,9 @@ export const processMapData = (
     createdAt: mapData.created_at,
     centerCoords,
     activities,
-    minMaxValues,
+    minMaxActivities,
+    minMaxSegments,
+    activitiesWithSegmentsCount,
   };
 
   if (isOwner) {
