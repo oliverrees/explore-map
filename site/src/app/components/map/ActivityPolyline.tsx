@@ -122,8 +122,8 @@ const ActivityPolyline = ({
               ? blue
               : getColorFromValue(
                   layerData,
-                  minMax[0],
-                  minMax[1],
+                  minMax?.[0],
+                  minMax?.[1],
                   selectedLayer
                 );
           return (

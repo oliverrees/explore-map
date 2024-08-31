@@ -28,6 +28,8 @@ export const Layers = ({
   ];
 
   const handleSelectionChange = (e: any) => {
+    // Don't allow a non existent layer to be selected
+    if (!layers.map((layer) => layer.key).includes(e.target.value)) return;
     setSelectedLayer(e.target.value);
   };
 
