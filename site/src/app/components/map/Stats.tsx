@@ -12,7 +12,7 @@ export const revalidate = 600;
 const Stats = ({ data, showSatellite, dark }: Props) => {
   const isDark = dark || showSatellite;
   return (
-    <div className="ml-4 lg:ml-10 mb-1 lg:mb-10 overflow-hidden pointer-events-none lg:rounded-lg lg:shadow-lg z-20 lg:max-w-lg w-full">
+    <div className="pl-4 lg:pl-0 lg:ml-10 mb-1 lg:mb-10 overflow-hidden pointer-events-none lg:rounded-lg lg:shadow-lg z-20 lg:max-w-lg">
       <div
         className={`lg:pl-6 lg:pr-6  ${
           isDark

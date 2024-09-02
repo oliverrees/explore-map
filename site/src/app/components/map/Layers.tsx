@@ -8,6 +8,7 @@ type Props = {
   minMaxValues: Record<string, [number, number]>;
   dark?: boolean;
   isSegments?: boolean;
+  isHome?: boolean;
 };
 export const Layers = ({
   selectedLayer,
@@ -15,6 +16,7 @@ export const Layers = ({
   minMaxValues,
   dark,
   isSegments,
+  isHome = false,
 }: Props) => {
   const layers = [
     { key: "averageSpeed", label: "Avg Speed", unit: "km/h" },
@@ -64,7 +66,9 @@ export const Layers = ({
   return (
     <>
       <div
-        className={`absolute top-3.5 z-50 left-16 right-5 h-14 lg:right-0 lg:left-0 flex justify-center pointer-events-none ${
+        className={`absolute top-3.5 z-50 ${
+          !isHome ? "left-16" : "left-5 lg:mx-4"
+        } right-5 h-14 lg:right-0 lg:left-0 flex justify-center pointer-events-none ${
           dark ? "dark" : ""
         }`}
       >

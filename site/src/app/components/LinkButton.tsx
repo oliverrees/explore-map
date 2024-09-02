@@ -19,7 +19,7 @@ export const LinkButton = ({
   return (
     <Link
       href={ctaLink}
-      target={ctaBlank ? "_blank" : "_self"}
+      target={"_blank"}
       className={`rounded-lg z-10 relative font-semibold text-sm border border-black py-2 px-4 inline-block  transition-all duration-300 ease-in-out ${background}`}
     >
       {ctaText} &rarr;

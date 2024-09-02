@@ -65,7 +65,7 @@ export const ThreeCardPanel = ({
                         {card.content}
                       </div>
                       <div className="p-2 pt-4 lg:pt-6">
-                        <h3 className="mt-1 text-2xl font-display leading-normal font-semibold">
+                        <h3 className="mt-1 text-2xl font-display leading-normal font-semibold [word-spacing:-7px]">
                           {card.name}
                         </h3>
                         <div className="mt-2 mb-2 font-light text-md opacity-80 flex flex-col gap-4">
@@ -76,11 +76,13 @@ export const ThreeCardPanel = ({
                           )}
                         </div>
                         {card.href && (
-                          <LinkButton
-                            darkMode={dark}
-                            ctaText={card.ctaText}
-                            ctaLink={card.href}
-                          />
+                          <div className="mt-6">
+                            <LinkButton
+                              darkMode={dark}
+                              ctaText={card.ctaText}
+                              ctaLink={card.href}
+                            />
+                          </div>
                         )}
                       </div>
                     </div>

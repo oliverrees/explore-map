@@ -32,6 +32,7 @@
     "puppeteer-core": "^23.2.1",
     "react": "^18",
     "react-dom": "^18",
+    "react-intersection-observer": "^9.13.0",
     "react-leaflet": "^4.2.1",
     "react-transition-progress": "^0.0.4",
     "react-twitter-embed": "^4.0.4",

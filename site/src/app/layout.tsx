@@ -3,6 +3,7 @@ import { IBM_Plex_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
 import PlausibleProvider from "next-plausible";
+import NextTopLoader from "nextjs-toploader";
 
 const ibmMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -56,6 +57,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${ibmMono.className} ${inter.className} `}>
+        <NextTopLoader
+          showSpinner={false}
+          color="rgb(37 99 235)"
+          zIndex={100}
+        />
         <PlausibleProvider domain="exploremap.io" />
         <NextUIProvider>{children}</NextUIProvider>
       </body>

@@ -6,7 +6,7 @@ export default function ContactPage() {
   return (
     <>
       <Header />
-      <Container customPadding="py-6 font-light">
+      <Container customPadding="py-6 px-6 lg:px-0 font-light">
         <h1 className="text-3xl font-bold mb-6">Contact us</h1>
         <p className="mb-4">
           If you have any questions or feedback, email us at

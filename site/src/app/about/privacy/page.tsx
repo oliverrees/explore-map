@@ -70,7 +70,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Header />
-      <Container customPadding="py-6 font-light">
+      <Container customPadding="py-6 px-6 lg:px-0 font-light">
         <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
         <p className="mb-4">Effective Date: {privacyPolicy.effectiveDate}</p>
 
