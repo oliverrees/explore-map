@@ -22,7 +22,7 @@ export const HomeHeader = ({}: HomeHeaderProps) => {
           height: `${height}px`,
         }}
       >
-        <Header />
+        <Header darkMode />
         <Hero />
       </div>
     </>

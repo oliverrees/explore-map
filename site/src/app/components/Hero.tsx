@@ -39,10 +39,10 @@ export const Hero = ({}: HeroProps) => {
      bg-gradient-to-t from-transparent to-white lg:bg-gradient-to-b "
         />
       </div>
-      <div className="max-w-7xl mx-auto h-full relative w-full lg:px-8 lg:py-36 4xl:py-48">
+      <div className="max-w-7xl mx-auto h-full w-full lg:px-8 lg:py-36 4xl:py-48">
         <div className="flex flex-col lg:flex-row h-full justify-center items-center gap-5 lg:gap-16">
           <div className="h-full lg:max-h-96 w-full lg:w-11/12 lg:order-2 z-10">
-            <div className=" h-full relative overflow-hidden lg:top-0 lg:h-96 mx-4 shadow-sm rounded-lg bg-white">
+            <div className="h-full relative overflow-hidden lg:h-screen lg:absolute lg:w-1/2 lg:right-0 lg:top-0 mx-4 shadow-sm rounded-lg bg-white lg:shadow-none lg:rounded-none lg:mx-0">
               <Image
                 src={strava}
                 alt="Strava"
@@ -58,7 +58,7 @@ export const Hero = ({}: HeroProps) => {
               </h1>
               <div className="text-md md:text-lg xl:text-xl mt-3 md:mt-4 leading-6 font-light xl:leading-8 xl:w-10/12">
                 Combine multiple Strava activities into a single interactive map
-                to share with friends and family.
+                to share with friends & supporters.
               </div>
               <div className="flex gap-20 items-center flex-col lg:flex-row gap-x-12 gap-y-3 w-full mt-6 md:mt-8 lg:mt-10 h-auto">
                 {/* <Link
