@@ -25,7 +25,7 @@ export const Layers = ({
     { key: "maxHeartrate", label: "Max Heart Rate", unit: "bpm" },
     { key: "avgTemp", label: "Temperature", unit: "°C" },
     { key: "rainSum", label: "Rainfall", unit: "mm" },
-    { key: "windSpeed", label: "Wind Speed", unit: "m/s" },
+    { key: "windSpeed", label: "Wind Speed", unit: "km/h" },
     { key: "None", label: "None", unit: "" },
   ];
 
