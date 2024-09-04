@@ -26,10 +26,10 @@ const Map = ({
   const [showPins, setShowPins] = useState(true);
   const [open, setOpen] = useState(false);
   const [activityId, setActivityId] = useState(0);
-  const [showSatellite, setShowSatellite] = useState(false);
-  const [selectedLayer, setSelectedLayer] = useState(
-    !isHome ? "averageSpeed" : "averageHeartrate"
+  const [showSatellite, setShowSatellite] = useState(
+    isScreenshot || isHome ? true : false
   );
+  const [selectedLayer, setSelectedLayer] = useState("averageSpeed");
   const [dark, setDark] = useState(false);
 
   if (!data) return null;
@@ -52,10 +52,9 @@ const Map = ({
     );
   }
 
-  const tileUrl =
-    showSatellite || isHome
-      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-      : "https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}";
+  const tileUrl = showSatellite
+    ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    : "https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}";
 
   return (
     <div
@@ -85,14 +84,12 @@ const Map = ({
               isSegments={data.activitiesWithSegmentsCount > 0}
               isHome={isHome}
             />
-            {!isHome && (
-              <Sidebar
-                open={open}
-                onClose={() => setOpen(false)}
-                activityId={activityId}
-                mapId={data.mapId}
-              />
-            )}
+            <Sidebar
+              open={open}
+              onClose={() => setOpen(false)}
+              activityId={activityId}
+              mapId={data.mapId}
+            />
           </>
         )}
         <MapContainer
@@ -119,7 +116,7 @@ const Map = ({
             />
           ))}
         </MapContainer>
-        {!isScreenshot && !isHome && (
+        {!isScreenshot && (
           <div className="absolute bottom-0 left-0 w-full z-50 flex justify-between flex-col items-start lg:w-auto">
             <Stats data={data} showSatellite={showSatellite} dark={dark} />
           </div>

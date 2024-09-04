@@ -19,7 +19,7 @@ export const Header = ({ darkMode }: { darkMode?: boolean }) => {
   return (
     <header className={bgClasses}>
       <nav
-        className={`mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8 ${bgClasses}`}
+        className={`mx-auto flex max-w-7xl items-center justify-between p-6 py-4 lg:py-6 lg:px-8 ${bgClasses}`}
         aria-label="Global"
       >
         <div className="flex lg:flex-1 text-black">
@@ -30,7 +30,7 @@ export const Header = ({ darkMode }: { darkMode?: boolean }) => {
         <div className="flex lg:hidden">
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 "
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-black"
             onClick={() => setMobileMenuOpen(true)}
           >
             <span className="sr-only">Open main menu</span>
@@ -65,7 +65,7 @@ export const Header = ({ darkMode }: { darkMode?: boolean }) => {
         onClose={setMobileMenuOpen}
       >
         <div className="fixed inset-0" />
-        <Dialog.Panel className="fixed inset-y-0 right-0 w-full overflow-y-auto bg-white z-30 text-black px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 ">
+        <Dialog.Panel className="fixed inset-y-0 right-0 w-full overflow-y-auto bg-white z-30 text-black px-6 py-4 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 ">
           <div className="flex flex-col justify-between h-full">
             <div>
               <div className="flex items-center justify-between relative z-40">

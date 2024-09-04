@@ -67,7 +67,7 @@ export const Layers = ({
     <>
       <div
         className={`absolute top-3.5 z-50 ${
-          !isHome ? "left-16" : "left-5 lg:mx-4"
+          !isHome ? "left-16" : "left-5 lg:mx-4 lg:top-20"
         } right-5 h-14 lg:right-0 lg:left-0 flex justify-center pointer-events-none ${
           dark ? "dark" : ""
         }`}

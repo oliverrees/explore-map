@@ -43,11 +43,11 @@ export const Hero = ({}: HeroProps) => {
         <div className="flex flex-col lg:flex-row h-full justify-center items-center gap-5 lg:gap-16">
           <div className="h-full lg:max-h-96 w-full lg:w-11/12 lg:order-2 z-10">
             <div className="h-full relative overflow-hidden lg:h-screen lg:absolute lg:w-1/2 lg:right-0 lg:top-0 mx-4 shadow-sm rounded-lg bg-white lg:shadow-none lg:rounded-none lg:mx-0">
-              <Image
+              {/* <Image
                 src={strava}
                 alt="Strava"
                 className="absolute  z-10 h-12 w-auto left-2 bottom-2"
-              />
+              /> */}
               <Map data={demoRide} isPublic={true} isHome={true} />
             </div>
           </div>
@@ -61,18 +61,18 @@ export const Hero = ({}: HeroProps) => {
                 to share with friends & supporters.
               </div>
               <div className="flex gap-20 items-center flex-col lg:flex-row gap-x-12 gap-y-3 w-full mt-6 md:mt-8 lg:mt-10 h-auto">
-                {/* <Link
+                <Link
                   href={getStravaAuthUrl()}
                   className="w-full bg-[#FC4C02] lg:w-auto flex justify-center"
                 >
                   <Image src={stravaConnect} alt="Strava Connect" />
-                </Link> */}
-                <Link
+                </Link>
+                {/* <Link
                   href={"/join"}
                   className="w-full lg:w-auto rounded-md bg-blue-600 px-3 py-2 lg:px-6 lg:py-3 text-center text-md font-semibold leading-6 text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 >
                   Join the waitlist
-                </Link>
+                </Link> */}
                 <a
                   href="#how"
                   className="text-xs w-full lg:w-auto lg:inline-flex text-black/30 text-center lg:text-lg hover:text-black/90 transition-all duration-300 ease-in-out mb-3 lg:mb-0"
