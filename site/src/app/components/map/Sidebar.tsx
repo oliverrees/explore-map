@@ -161,7 +161,7 @@ export default function Sidebar({
     {
       name: "Wind Speed",
       value: activityInfo?.weather?.wind_speed_10m_max,
-      unit: "m/s",
+      unit: "km/h",
     },
     {
       name: "Rainfall",
