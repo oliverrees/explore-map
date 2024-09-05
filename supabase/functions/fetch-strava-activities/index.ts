@@ -54,32 +54,17 @@ serve(async (req) => {
     }
 
     if (existingTask) {
-      // Check if the last task was more than 5 minutes ago
-      const lastUpdated = new Date(existingTask.updated_at);
-      const now = new Date();
-      const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-
-      if (lastUpdated < fiveMinutesAgo) {
-        // Mark the old task as completed
-        await supabase
-          .from("exploremap_tasks")
-          .update({
-            status: "completed",
-            data: { message: "Automatically completed after timeout" },
-          })
-          .eq("id", existingTask.id);
-      } else {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            message: "An identical task is already in progress",
-          }),
-          {
-            status: 409, // Conflict
-            headers: corsHeaders,
-          }
-        );
-      }
+      // Task is already in progress, return early to avoid multiple executions
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Task already in progress",
+        }),
+        {
+          status: 409,
+          headers: corsHeaders,
+        }
+      );
     }
 
     // Insert a new task record into the tasks table

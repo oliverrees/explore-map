@@ -54,6 +54,8 @@ export const ActivityTable = ({
     null
   ); // For shift-click selection
 
+  let isRequesting = false; // Prevent multiple simultaneous sync requests
+
   const checkTaskStatus = async () => {
     try {
       const response = await fetch(
@@ -121,6 +123,9 @@ export const ActivityTable = ({
   };
 
   const syncActivitiesWithStrava = async (forceReload?: boolean) => {
+    if (isRequesting) return; // Prevent multiple calls
+    isRequesting = true;
+
     setLoadingMessage("Loading activities from Strava...");
     const { data, error } = await supabase.functions.invoke(
       "fetch-strava-activities",
@@ -132,6 +137,7 @@ export const ActivityTable = ({
     if (error) {
       setError(error.message);
     }
+    isRequesting = false; // Reset flag after request
   };
 
   useEffect(() => {
@@ -159,10 +165,10 @@ export const ActivityTable = ({
 
   const handleSyncButtonClick = async () => {
     setLoading(true);
+    await syncActivitiesWithStrava(true);
     setTimeout(() => {
       checkTaskStatus();
     }, 500);
-    await syncActivitiesWithStrava(true);
   };
 
   const handleShiftSelect = (index: number) => {

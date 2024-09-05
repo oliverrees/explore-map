@@ -7,6 +7,7 @@ import { secondsToDaysHours } from "../../../../../../lib/functions/secondsToDay
 import { formatNumber } from "../../../../../../lib/functions/formatNumber";
 import { secondsToHMS } from "../../../../../../lib/functions/secondsToHMS";
 import { secondsToHours } from "date-fns";
+import MapBanner from "./MapBanner";
 
 interface MapSettingsProps {
   data: any;
@@ -67,6 +68,7 @@ export const MapStats = ({ data }: MapSettingsProps) => {
   return (
     <>
       {/* Stats */}
+      {data.weatherToGet.length > 0 && <MapBanner />}
       <div className="grid grid-cols-3 bg-white">
         {stats.map((stat, statIdx) => (
           <div

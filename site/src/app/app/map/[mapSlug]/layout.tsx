@@ -52,6 +52,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       let weatherDataFetched = false;
       let additionalActivityDataFetched = false;
 
+      setData(processedData);
+      setLoading(false);
+
       // Fetch weather data if needed
       if (processedData.weatherToGet.length > 0) {
         const { data: weatherData, error: weatherError } =
@@ -93,14 +96,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         // Reprocess map data with the updated activities data
         processedData = processMapData(mapData, activitiesData.data, true);
+        setData(processedData);
       }
-
-      // Set the processed data
-      setData(processedData);
     } catch (error) {
       console.error("Error loading map data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
