@@ -27,9 +27,9 @@ html {
   filter: invert(100%) hue-rotate(90deg) brightness(100%) contrast(100%);
 }
 
-/* .map-home .leaflet-layer,
+.map-home .leaflet-layer,
 .map-home .leaflet-control-zoom-in,
 .map-home .leaflet-control-zoom-out,
 .map-home .leaflet-control-attribution {
-  filter: brightness(80%) contrast(100%);
-} */
+  filter: brightness(70%) contrast(100%);
+}
