@@ -240,6 +240,7 @@ export const processMapData = (
     minMaxActivities,
     minMaxSegments,
     activitiesWithSegmentsCount,
+    links: mapData.links,
   };
 
   if (isOwner) {
