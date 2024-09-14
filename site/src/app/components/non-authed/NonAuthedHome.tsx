@@ -152,7 +152,7 @@ export const NonAuthedHome = ({}: NonAuthedHomeProps) => {
           {
             id: 2,
             name: "Freiberg - Cape Town",
-            href: "https://exploremap.io/map/freiberg-to-cape-town",
+            href: "https://exploremap.io/map/freiburg-to-cape-town",
             ctaText: "View Wiebke's Map",
             description: [
               "Wiebke Lühmann is cycling from Freiberg in Germany to Cape Town in South Africa. This map is updated daily with her progress.",

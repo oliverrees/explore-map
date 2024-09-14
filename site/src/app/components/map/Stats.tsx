@@ -11,7 +11,6 @@ type Props = {
 export const revalidate = 600;
 
 const Stats = ({ data, showSatellite, dark }: Props) => {
-  console.log(data);
   const isDark = dark || showSatellite;
   return (
     <div className="pl-4 lg:pl-0 lg:ml-10 mb-1 lg:mb-10 overflow-hidden pointer-events-none lg:rounded-lg lg:shadow-lg z-20 lg:max-w-lg">
