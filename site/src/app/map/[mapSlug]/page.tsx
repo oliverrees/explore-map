@@ -3,7 +3,7 @@ import { MapHolder } from "./components/MapHolder";
 import { processMapData } from "@/app/components/map/lib/processMapData";
 import { EmptyScreen } from "@/app/components/map/EmptyScreen";
 
-export const revalidate = 5;
+export const revalidate = 500;
 
 export async function generateMetadata({
   params,
