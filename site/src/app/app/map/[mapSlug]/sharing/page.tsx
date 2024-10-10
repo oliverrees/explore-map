@@ -83,7 +83,7 @@ export default function MapPage() {
               target="new"
               className="text-blue-500 mt-1 lg:mt-0"
             >
-              https://exploremap.app/map/{data.mapData.slug}
+              https://exploremap.io/map/{data.mapData.slug}
             </Link>
           </Field>
         )}
